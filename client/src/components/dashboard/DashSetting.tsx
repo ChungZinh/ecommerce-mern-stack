@@ -12,20 +12,21 @@ import { useSelector } from "react-redux";
 import { HiUpload } from "react-icons/hi";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { formatDate } from "../../utils/formatDate";
+
 export default function DashSetting() {
-  const [tab, setTab] = useState("profile");
+  const [tab, setTab] = useState<string>("profile");
 
   return (
-    <div className="w-full  bg-neutral-100">
+    <div className="w-full bg-neutral-100">
       <div className="p-10">
         <h1 className="text-3xl font-semibold">Profile Setting</h1>
 
         <div className="flex flex-col md:flex-row w-full rounded-xl shadow-md">
-          {/* SUBTAB  */}
+          {/* SUBTAB */}
           <div className="md:w-80 bg-white rounded-xl">
             <Sidebar className="w-full border-r border-neutral-200">
               <Sidebar.Items>
-                <Sidebar.ItemGroup className="*:cursor-pointer">
+                <Sidebar.ItemGroup className="cursor-pointer">
                   <Sidebar.Item active={tab === "profile"}>
                     <p onClick={() => setTab("profile")}>Profile</p>
                   </Sidebar.Item>
@@ -52,19 +53,19 @@ export default function DashSetting() {
 
 const Profile = () => {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<String | null>(
-    currentUser.dateOfBirth
+  const [image, setImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(currentUser.avatar);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    formatDate(currentUser.dateOfBirth)
   );
-  const handleDateChange = (date: String | null) => {
-    const dateFormat = formatDate(date);
-    console.log(dateFormat);
-    setSelectedDate(dateFormat);
+
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDateChange = (date: string | null) => {
+    setSelectedDate(date ? formatDate(date) : null);
   };
 
-  const imageInputRef = useRef();
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -75,6 +76,7 @@ const Profile = () => {
 
   const handleUpload = async () => {
     setLoading(true);
+
     const params = {
       region: import.meta.env.VITE_S3_REGION!,
       accessKeyId: import.meta.env.VITE_S3_ACCESS_KEY!,
@@ -82,17 +84,19 @@ const Profile = () => {
       bucket: import.meta.env.VITE_S3_BUCKET!,
     };
 
-    if (!image) return;
+    if (!image) {
+      setLoading(false);
+      return;
+    }
 
     uploadFileToS3(
       image,
       params,
-      (url) => {
+      (url: string) => {
         setImageUrl(url);
-        console.log("Image uploaded successfully");
         setLoading(false);
       },
-      (error) => {
+      (error: any) => {
         console.error("Error uploading image", error);
         setLoading(false);
       }
@@ -100,10 +104,10 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col p-2  ">
-      <div className="w-full flex p-2 ">
+    <div className="flex flex-col p-2">
+      <div className="w-full flex p-2">
         <div className="w-2/3 p-4">
-          <div className="grid grid-cols-2 gap-4 ">
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">First Name</Label>
               <TextInput
@@ -159,11 +163,7 @@ const Profile = () => {
           </div>
 
           <div className="mt-8">
-            <Button
-              className="text-sm bg-[#3BB67F]"
-              size={"sm"}
-              color={"green"}
-            >
+            <Button className="text-sm bg-[#3BB67F]" size="sm" color="green">
               Save Changes
             </Button>
           </div>
@@ -171,9 +171,9 @@ const Profile = () => {
         {/* UPLOAD AVATAR */}
         <div className="w-1/3">
           <div className="flex justify-center items-center h-full flex-col gap-4">
-            <div onClick={() => imageInputRef.current.click()} className="">
+            <div onClick={() => imageInputRef.current?.click()}>
               <img
-                src={imageUrl || currentUser.avatar}
+                src={imageUrl}
                 alt=""
                 className="lg:w-40 lg:h-40 md:w-32 md:h-32 rounded-full"
               />
@@ -187,18 +187,18 @@ const Profile = () => {
             />
             <Button
               className="text-sm border"
-              size={"sm"}
-              color={"green"}
+              size="sm"
+              color="green"
               outline
               onClick={handleUpload}
             >
               {loading ? (
-                <div className="">
-                  <Spinner size={"sm"} />
-                  <span className="pl-3">Loading...</span>
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  <span>Loading...</span>
                 </div>
               ) : (
-                <div className="gap-4">
+                <div className="flex items-center gap-2">
                   <HiUpload className="inline-block" />
                   Upload
                 </div>
@@ -208,28 +208,28 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className=" p-6 border-t">
+      <div className="p-6 border-t">
         <div className="grid grid-cols-2 gap-6">
-          <div className="border p-4 pb-8 rounded-md bg-neutral-100 flex justify-between">
-            <div className="">
+          <div className="border p-4 pb-8 rounded-md bg-neutral-100 flex flex-col lg:flex-row lg:justify-between items-start lg:items-center">
+            <div>
               <h1 className="text-base font-semibold">Password</h1>
               <p className="text-sm text-neutral-400">
                 You can reset or change your password by clicking here
               </p>
             </div>
-            <Button color={"green"} className="border">
+            <Button color="green" className="border h-11 mt-4 lg:mt-0">
               Change
             </Button>
           </div>
-          <div className="border p-4 pb-8 rounded-md bg-neutral-100 flex justify-between">
-            <div className="">
+          <div className="border p-4 pb-8 rounded-md bg-neutral-100 flex flex-col lg:flex-row lg:justify-between items-start lg:items-center ">
+            <div>
               <h1 className="text-base font-semibold">Remove account</h1>
               <p className="text-sm text-neutral-400">
                 Once you delete your account, there is no going back. Please be
                 certain.
               </p>
             </div>
-            <Button color={"green"} className="border">
+            <Button color="green" className="border  h-11 mt-4 lg:mt-0">
               Deactivate
             </Button>
           </div>
