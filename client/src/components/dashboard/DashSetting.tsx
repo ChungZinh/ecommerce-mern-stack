@@ -1,10 +1,18 @@
-import { Button, Datepicker, Label, Sidebar, TextInput } from "flowbite-react";
+import {
+  Button,
+  Datepicker,
+  Label,
+  Sidebar,
+  Spinner,
+  TextInput,
+} from "flowbite-react";
 import React, { ChangeEvent, useRef, useState } from "react";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { HiUpload } from "react-icons/hi";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
+import { formatDate } from "../../utils/formatDate";
 export default function DashSetting() {
   const [tab, setTab] = useState("profile");
 
@@ -43,12 +51,18 @@ export default function DashSetting() {
   );
 }
 
-
-
 const Profile = () => {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [url, setUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const handleDateChange = (date: Date | null) => {
+    const dateFormat = formatDate(date)
+    setSelectedDate(dateFormat);
+
+  };
+
+  console.log(selectedDate);
   const imageInputRef = useRef();
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,6 +73,7 @@ const Profile = () => {
   };
 
   const handleUpload = async () => {
+    setLoading(true);
     const params = {
       region: import.meta.env.VITE_S3_REGION!,
       accessKeyId: import.meta.env.VITE_S3_ACCESS_KEY!,
@@ -74,9 +89,11 @@ const Profile = () => {
       (url) => {
         setImageUrl(url);
         console.log("Image uploaded successfully");
+        setLoading(false);
       },
       (error) => {
         console.error("Error uploading image", error);
+        setLoading(false);
       }
     );
   };
@@ -89,31 +106,55 @@ const Profile = () => {
           <div className="grid grid-cols-2 gap-4 ">
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">First Name</Label>
-              <TextInput id="firstName" placeholder="Type here" />
+              <TextInput
+                id="firstName"
+                placeholder="Type here"
+                value={currentUser.firstName}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Last Name</Label>
-              <TextInput id="lastName" placeholder="Type here" />
+              <TextInput
+                id="lastName"
+                placeholder="Type here"
+                value={currentUser.lastName}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Email</Label>
-              <TextInput id="email" placeholder="example@gmail.com" />
+              <TextInput
+                id="email"
+                placeholder="example@gmail.com"
+                value={currentUser.email}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Mobile</Label>
-              <TextInput id="mobile" placeholder="+123454657890" />
+              <TextInput
+                id="mobile"
+                placeholder="+123454657890"
+                value={currentUser.mobile}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-2 mt-4">
             <Label className="text-sm text-neutral-500">Address</Label>
-            <TextInput id="address" placeholder="Type here" />
+            <TextInput
+              id="address"
+              placeholder="Type here"
+              value={currentUser.address}
+            />
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Birthday</Label>
-              <Datepicker id="dateofBirth" />
+              <Datepicker
+                id="dateOfBirth"
+                // value={currentUser.dateofBirth}
+                onSelectedDateChanged={handleDateChange}
+              />
             </div>
           </div>
 
@@ -151,8 +192,17 @@ const Profile = () => {
               outline
               onClick={handleUpload}
             >
-              <HiUpload className="inline-block" />
-              Upload
+              {loading ? (
+                <div className="">
+                  <Spinner size={"sm"} />
+                  <span className="pl-3">Loading...</span>
+                </div>
+              ) : (
+                <div className="gap-4">
+                  <HiUpload className="inline-block" />
+                  Upload
+                </div>
+              )}
             </Button>
           </div>
         </div>
