@@ -7,6 +7,16 @@ interface Credentials {
   password: string;
 }
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  mobile: string;
+  address: string;
+  dateOfBirth: string;
+  avatar: string;
+  email: string;
+}
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -23,6 +33,10 @@ interface SignUpResponse {
 
 interface LogoutResponse {
   message: string;
+}
+
+interface UpdateUser {
+  data: any;
 }
 
 const getAuthToken = (): string | null => {
@@ -79,6 +93,14 @@ export const api = {
   logout: (userId: string) =>
     request<LogoutResponse>("/auth/logout", {
       method: "POST",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+  updateUser: (formData: FormData, userId: string): Promise<UpdateUser> =>
+    request<UpdateUser>(`/user/update/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(formData),
       headers: {
         "x-client-id": userId,
       },

@@ -6,12 +6,18 @@ import {
   Spinner,
   TextInput,
 } from "flowbite-react";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { RootState } from "../../redux/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { HiUpload } from "react-icons/hi";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { formatDate } from "../../utils/formatDate";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} from "../../redux/user/userSlice";
+import { api } from "../../api/api";
 
 export default function DashSetting() {
   const [tab, setTab] = useState<string>("profile");
@@ -51,11 +57,29 @@ export default function DashSetting() {
   );
 }
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  mobile: string;
+  address: string;
+  dateOfBirth: string;
+  avatar: string;
+  email: string;
+}
+
 const Profile = () => {
+  const dispatch = useDispatch();
+  const { loadingUpdate } = useSelector((state: RootState) => state.user);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(currentUser.avatar);
   const [loading, setLoading] = useState<boolean>(false);
+  const [formData, setFormData] = useState({} as FormData);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
   const [selectedDate, setSelectedDate] = useState<string | null>(
     formatDate(currentUser.dateOfBirth)
   );
@@ -64,6 +88,7 @@ const Profile = () => {
 
   const handleDateChange = (date: string | null) => {
     setSelectedDate(date ? formatDate(date) : null);
+    setFormData({ ...formData, dateOfBirth: selectedDate! });
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +120,7 @@ const Profile = () => {
       (url: string) => {
         setImageUrl(url);
         setLoading(false);
+        setFormData({ ...formData, avatar: url });
       },
       (error: any) => {
         console.error("Error uploading image", error);
@@ -103,25 +129,40 @@ const Profile = () => {
     );
   };
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(updateUserStart());
+    try {
+      const res = await api.updateUser(formData, currentUser._id);
+      console.log(res);
+      if (res.data) {
+        dispatch(updateUserSuccess(res.data));
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(updateUserFailure(error));
+    }
+  };
+
   return (
     <div className="flex flex-col p-2">
-      <div className="w-full flex p-2">
+      <form className="w-full flex p-2" onSubmit={handleSubmit}>
         <div className="w-2/3 p-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">First Name</Label>
               <TextInput
                 id="firstName"
-                placeholder="Type here"
-                value={currentUser.firstName}
+                placeholder={currentUser.firstName}
+                onChange={handleChange}
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Last Name</Label>
               <TextInput
                 id="lastName"
-                placeholder="Type here"
-                value={currentUser.lastName}
+                placeholder={currentUser.lastName}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -130,16 +171,16 @@ const Profile = () => {
               <Label className="text-sm text-neutral-500">Email</Label>
               <TextInput
                 id="email"
-                placeholder="example@gmail.com"
-                value={currentUser.email}
+                placeholder={currentUser.email}
+                onChange={handleChange}
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-neutral-500">Mobile</Label>
               <TextInput
                 id="mobile"
-                placeholder="+123454657890"
-                value={currentUser.mobile}
+                placeholder={currentUser.mobile}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -147,8 +188,8 @@ const Profile = () => {
             <Label className="text-sm text-neutral-500">Address</Label>
             <TextInput
               id="address"
-              placeholder="Type here"
-              value={currentUser.address}
+              placeholder={currentUser.address}
+              onChange={handleChange}
             />
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
@@ -163,8 +204,20 @@ const Profile = () => {
           </div>
 
           <div className="mt-8">
-            <Button className="text-sm bg-[#3BB67F]" size="sm" color="green">
-              Save Changes
+            <Button
+              type="submit"
+              className="text-sm bg-[#3BB67F]"
+              size="sm"
+              color="green"
+            >
+              {loading ? (
+                <div className="">
+                  <Spinner size={"sm"} />
+                  <span className="pl-3">Loading...</span>
+                </div>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </div>
         </div>
@@ -206,7 +259,7 @@ const Profile = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </form>
 
       <div className="p-6 border-t">
         <div className="grid grid-cols-2 gap-6">
