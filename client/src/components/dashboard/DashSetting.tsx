@@ -6,10 +6,9 @@ import {
   Spinner,
   TextInput,
 } from "flowbite-react";
-import React, { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { HiUpload } from "react-icons/hi";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { formatDate } from "../../utils/formatDate";
@@ -52,17 +51,19 @@ export default function DashSetting() {
 }
 
 const Profile = () => {
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const handleDateChange = (date: Date | null) => {
-    const dateFormat = formatDate(date)
+  const [selectedDate, setSelectedDate] = useState<String | null>(
+    currentUser.dateOfBirth
+  );
+  const handleDateChange = (date: String | null) => {
+    const dateFormat = formatDate(date);
+    console.log(dateFormat);
     setSelectedDate(dateFormat);
-
   };
 
-  console.log(selectedDate);
   const imageInputRef = useRef();
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -97,7 +98,6 @@ const Profile = () => {
       }
     );
   };
-  const currentUser = useSelector((state: RootState) => state.user.currentUser);
 
   return (
     <div className="flex flex-col p-2  ">
@@ -152,7 +152,7 @@ const Profile = () => {
               <Label className="text-sm text-neutral-500">Birthday</Label>
               <Datepicker
                 id="dateOfBirth"
-                // value={currentUser.dateofBirth}
+                value={selectedDate}
                 onSelectedDateChanged={handleDateChange}
               />
             </div>
