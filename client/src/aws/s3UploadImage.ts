@@ -9,7 +9,6 @@ interface UploadParams {
   bucket: string;
 }
 
-
 export const uploadFileToS3 = async (
   file: File,
   params: UploadParams,
@@ -17,7 +16,6 @@ export const uploadFileToS3 = async (
   onError: (error: any) => void
 ) => {
   const { region, accessKeyId, secretAccessKey, bucket } = params;
-
   const s3Client = new S3Client({
     region,
     credentials: {
