@@ -73,6 +73,10 @@ class AuthService {
       token: tokens.accessToken,
     };
   }
+
+  static async logout(user) {
+    await KeyService.deleteKey(user._id);
+  }
 }
 
 module.exports = AuthService;

@@ -14,6 +14,13 @@ class AuthController {
       data: await AuthService.signIn(req.body),
     }).send(res);
   }
+
+  static async logout(req, res, next) {
+    new SuccessResponse({
+      message: "Logout successful",
+      data: await AuthService.logout(req.user),
+    }).send(res);
+  }
 }
 
 module.exports = AuthController;

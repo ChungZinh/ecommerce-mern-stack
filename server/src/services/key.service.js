@@ -22,6 +22,10 @@ class KeyService {
     }
   }
 
+  static async deleteKey(userId) {
+    return await Key.deleteOne({ userId: userId });
+  }
+
   static async findByUserId(userId) {
     return Key.findOne({ userId: userId });
   }
