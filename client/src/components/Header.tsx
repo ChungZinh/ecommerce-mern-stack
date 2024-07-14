@@ -58,7 +58,7 @@ export default function Header({ role }: { role: string }) {
                   label={<Avatar alt={currentUser.avatar} rounded />}
                 >
                   <Dropdown.Header>
-                    <span className="block text-sm">@user</span>
+                    <span className="block text-sm">{currentUser.email}</span>
                     {/* <span className="block text-sm font-medium truncate">
                   {currentUser.email}
                 </span> */}
