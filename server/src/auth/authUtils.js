@@ -25,7 +25,10 @@ const generateTokens = (payload, privateKey) => {
 };
 
 const verifyToken = asyncHandler(async (req, res, next) => {
-  const token = req.headers[HEADER.AUTHORIZATION]?.toString();
+  const authorizationHeader = req.headers[HEADER.AUTHORIZATION];
+  const token = authorizationHeader
+    ? authorizationHeader.toString().split(" ")[1]
+    : null;
   const userId = req.headers[HEADER.CLIENT_ID]?.toString();
   const key = await KeyService.findByUserId(userId);
   if (!token) throw new UnauthorizedResponse("Token is required");
