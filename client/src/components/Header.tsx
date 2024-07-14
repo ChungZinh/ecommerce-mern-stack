@@ -1,7 +1,7 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { IoNotificationsSharp } from "react-icons/io5";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -9,14 +9,31 @@ import { setTheme } from "../redux/theme/themeSlice";
 import { MdSunny } from "react-icons/md";
 import { IoMdMoon } from "react-icons/io";
 import { AiOutlineSearch } from "react-icons/ai";
+import { api } from "../api/api";
+import { logoutSuccess } from "../redux/user/userSlice";
 export default function Header({ role }: { role: string }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const theme = useSelector((state: RootState) => state.theme.value);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const toggleTheme = () => {
     dispatch(setTheme(theme === "light" ? "dark" : "light"));
   };
-  
+
+  const handleLogout = async () => {
+    try {
+      const res = await api.logout(currentUser._id);
+      console.log(res)
+      if (res.message) {
+        localStorage.removeItem("token");
+        dispatch(logoutSuccess());
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       {role === "admin" ? (
@@ -67,7 +84,7 @@ export default function Header({ role }: { role: string }) {
                     <Dropdown.Item>Profile</Dropdown.Item>
                   </Link>
                   <Dropdown.Divider />
-                  <Dropdown.Item>Sign out</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
                 </Dropdown>
               ) : (
                 <Button className="bg-[#3BB67F] hover:bg-[#D9F1E4] duration-200">

@@ -1,6 +1,6 @@
-// api.ts
-
+import { useSelector } from "react-redux";
 import { BASE_URL } from "../constants";
+import { RootState } from "../redux/store";
 
 interface Credentials {
   email: string;
@@ -14,24 +14,28 @@ interface ApiResponse<T> {
 }
 
 interface SignInResponse {
-  data: any; // Adjust this type according to your actual response structure
   token: string;
 }
-
 interface SignUpResponse {
-  data: any; // Adjust this type according to your actual response structure
+  // No additional data needed if not used
+  data: any;
+}
+
+interface LogoutResponse {
+  message: string;
 }
 
 const getAuthToken = (): string | null => {
-  return localStorage.getItem("token"); // Giả sử token được lưu trữ trong localStorage
+  return localStorage.getItem("token"); // Assume token is stored in localStorage
 };
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
   const data: T = await response.json();
   if (!response.ok) {
-    // Xử lý phản hồi không phải 2xx
-    const error = (data as ApiResponse<T>).message || response.statusText;
-    throw new Error(error);
+    const error = new Error(
+      (data as ApiResponse<T>).message || response.statusText || "Unknown error"
+    );
+    throw error;
   }
   return data;
 };
@@ -71,5 +75,12 @@ export const api = {
     request<SignUpResponse>("/auth/sign-up", {
       method: "POST",
       body: JSON.stringify(credentials),
+    }),
+  logout: (userId: string) =>
+    request<LogoutResponse>("/auth/logout", {
+      method: "POST",
+      headers: {
+        "x-client-id": userId,
+      },
     }),
 };
