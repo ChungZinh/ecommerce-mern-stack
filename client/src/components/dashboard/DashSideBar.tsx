@@ -8,6 +8,7 @@ import {
   HiChartPie,
   HiCog,
   HiCurrencyDollar,
+  HiFolderAdd,
   HiShoppingBag,
   HiShoppingCart,
   HiTag,
