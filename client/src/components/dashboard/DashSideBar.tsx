@@ -47,7 +47,9 @@ export default function DashSideBar() {
           <Sidebar.Collapse icon={HiShoppingBag} label="Products">
             <Sidebar.Item href="#">Product List</Sidebar.Item>
             <Sidebar.Item href="#">Product Gird</Sidebar.Item>
-            <Sidebar.Item href="#">Categories</Sidebar.Item>
+            <Sidebar.Item href="#" active={tab === "categories"}>
+              <Link to={"/dashboard?tab=categories"}>Categories</Link>
+            </Sidebar.Item>
           </Sidebar.Collapse>
           <Sidebar.Collapse icon={HiShoppingCart} label="Orders">
             <Sidebar.Item href="#">Order list 1</Sidebar.Item>
