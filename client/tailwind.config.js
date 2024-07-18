@@ -17,5 +17,5 @@ export default {
     //   third: "#D9F1E4",
     // },
   },
-  plugins: [flowbite.plugin()],
+  plugins: [flowbite.plugin(), require("tailwind-scrollbar")],
 };

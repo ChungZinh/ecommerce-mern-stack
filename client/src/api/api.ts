@@ -17,6 +17,14 @@ interface FormData {
   email: string;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  parent: string;
+  description: string;
+}
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -100,6 +108,17 @@ export const api = {
   updateUser: (formData: FormData, userId: string): Promise<UpdateUser> =>
     request<UpdateUser>(`/user/update/${userId}`, {
       method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+  createCategory: (
+    formData: Category,
+    userId: string
+  ): Promise<ApiResponse<Category>> =>
+    request<ApiResponse<Category>>(`/category/create`, {
+      method: "POST",
       body: JSON.stringify(formData),
       headers: {
         "x-client-id": userId,
