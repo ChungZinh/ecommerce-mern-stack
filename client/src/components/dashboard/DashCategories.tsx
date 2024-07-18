@@ -10,7 +10,7 @@ import {
 } from "flowbite-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { api } from "../../api/api";
 
 interface FormData {
@@ -35,6 +35,20 @@ export default function DashCategories() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await api.getListCategory(currentUser._id);
+        if (res.data) {
+          setCategories(res.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    };
+    fetchCategories();
+  }, [currentUser._id,]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,9 +101,9 @@ export default function DashCategories() {
               <div className="space-y-2">
                 <Label>Category parent</Label>
                 <Select id="parent" onChange={handleChange}>
-                  <option value={""}>None</option>
-                  <option>Category 1</option>
-                  <option>Category 2</option>
+                  {categories.map((category) => (
+                    <option key={category._id}>{category.name}</option>
+                  ))}
                 </Select>
               </div>
               <div className="space-y-2">

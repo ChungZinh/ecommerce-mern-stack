@@ -124,4 +124,12 @@ export const api = {
         "x-client-id": userId,
       },
     }),
+
+  getListCategory: (userId: string): Promise<ApiResponse<Category[]>> =>
+    request<ApiResponse<Category[]>>(`/category/getList`, {
+      method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
 };
