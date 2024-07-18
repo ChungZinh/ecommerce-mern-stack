@@ -1,3 +1,4 @@
+const Product = require("../models/product.model");
 class ProductService {
   static async createProduct(data) {
     return await Product.create({
@@ -6,3 +7,5 @@ class ProductService {
     });
   }
 }
+
+module.exports = ProductService;
