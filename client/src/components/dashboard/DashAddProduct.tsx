@@ -11,11 +11,53 @@ import { ChangeEvent, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
+interface category {
+  name: string;
+  subCategories?: category[];
+  slug: string;
+  tag?: string;
+  description: string;
+}
 export default function DashAddProduct() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const imageRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>("");
+  const [category, setCategory] = useState<category[]>([
+    {
+      name: "Milk & Dairies",
+      slug: "milk-dairies",
+      description: "Milk, cheese, and other dairy products",
+    },
+    {
+      name: "Pet Food",
+      slug: "pet-food",
+      description: "Food and supplies for pets",
+    },
+    {
+      name: "Baking Material",
+      slug: "baking-material",
+      description: "Ingredients for baking",
+    },
+    {
+      name: "Fresh Fruit",
+      slug: "fresh-fruit",
+      description: "Variety of fresh fruits",
+      subCategories: [
+        {
+          name: "Citrus Fruits",
+          slug: "citrus-fruits",
+          description: "Citrus fruits like oranges and lemons",
+        },
+        {
+          name: "Berries",
+          slug: "berries",
+          description: "Different kinds of berries",
+        },
+      ],
+    },
+  ]);
+
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -30,8 +72,10 @@ export default function DashAddProduct() {
           <h1 className="text-3xl font-semibold">Add New Product</h1>
 
           <div className="flex items-center gap-2">
-            <Button color={"green"} className="">Save to draft</Button>
-            <Button  className="bg-[#3BB67F]">Publish</Button>
+            <Button color={"green"} className="">
+              Save to draft
+            </Button>
+            <Button className="bg-[#3BB67F]">Publish</Button>
           </div>
         </div>
 
@@ -47,6 +91,12 @@ export default function DashAddProduct() {
                 <div className="space-y-2">
                   <Label>Product title</Label>
                   <TextInput id="title" placeholder="Type here" />
+                </div>
+
+                {/* QUANTITY */}
+                <div className="space-y-2">
+                  <Label>Product quantity</Label>
+                  <TextInput id="quantity" placeholder="Type here" />
                 </div>
 
                 {/* DESCRIPTION */}
@@ -150,14 +200,17 @@ export default function DashAddProduct() {
                   <div className="space-y-2">
                     <Label>Category</Label>
                     <Select id="category">
-                      <option>Automobiles</option>
-                      <option>Electronic</option>
+                      {category.map((item, index) => (
+                        <option key={index}>{item.name}</option>
+                      ))}
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Sub-category</Label>
                     <Select id="sub-category">
-                      <option>Nissan</option>
+                      {category.map((item, index) => (
+                        <option key={index}>{item.slug}</option>
+                      ))}
                     </Select>
                   </div>
                 </div>
