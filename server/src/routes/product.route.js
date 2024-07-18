@@ -5,4 +5,5 @@ const ProductController = require("../controllers/product.controller");
 
 router.use(require("../auth/authUtils").verifyToken);
 router.post("/create", asyncHandler(ProductController.createProduct));
+router.get("/get-products-list", asyncHandler(ProductController.getProductsList));
 module.exports = router;

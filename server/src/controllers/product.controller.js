@@ -7,6 +7,13 @@ class ProductController {
       data: await ProductService.createProduct(req.body),
     }).send(res);
   }
+
+  static async getProductsList(req, res, next) {
+    new CreatedResponse({
+      message: "Products list",
+      data: await ProductService.getProductsList(req),
+    }).send(res);
+  }
 }
 
 module.exports = ProductController;
