@@ -13,7 +13,6 @@ var productSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      required: true,
     },
     slug: {
       type: String,
@@ -24,7 +23,19 @@ var productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    price: {
+    regu_price: {
+      type: Number,
+      required: true,
+    },
+    prom_price: {
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      enum: ["USD", "EUR", "JPY", "VND"],
+    },
+    tax: {
       type: Number,
       required: true,
     },
@@ -36,6 +47,17 @@ var productSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
+    },
+    specifications: {
+      weight: Number,
+      dimensions: {
+        width: Number,
+        height: Number,
+      },
+    },
+    shipping_fee: {
+      type: Number,
       required: true,
     },
     image: {
