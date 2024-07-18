@@ -3,13 +3,17 @@ import {
   Checkbox,
   Label,
   Select,
+  Spinner,
   Textarea,
   TextInput,
 } from "flowbite-react";
 import uploadIcon from "../../assets/images/upload.png";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { api } from "../../api/api";
+import { uploadFileToS3 } from "../../aws/s3UploadImage";
+import { s3Config } from "../../aws/s3Config";
 
 interface category {
   name: string;
@@ -18,45 +22,61 @@ interface category {
   tag?: string;
   description: string;
 }
+
+interface FormData {
+  name: string;
+  stock: number;
+  description: string;
+  regu_price: number;
+  prom_price: number;
+  currency: string;
+  tax: number;
+  width: number;
+  height: number;
+  weight: number;
+  shipping_fee: number;
+  category: string;
+  tag: string;
+  image: string;
+  isDraft: boolean;
+  isPublished: boolean;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  parent: string;
+  description: string;
+  subCategories?: Category[];
+}
 export default function DashAddProduct() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const imageRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>("");
-  const [category, setCategory] = useState<category[]>([
-    {
-      name: "Milk & Dairies",
-      slug: "milk-dairies",
-      description: "Milk, cheese, and other dairy products",
-    },
-    {
-      name: "Pet Food",
-      slug: "pet-food",
-      description: "Food and supplies for pets",
-    },
-    {
-      name: "Baking Material",
-      slug: "baking-material",
-      description: "Ingredients for baking",
-    },
-    {
-      name: "Fresh Fruit",
-      slug: "fresh-fruit",
-      description: "Variety of fresh fruits",
-      subCategories: [
-        {
-          name: "Citrus Fruits",
-          slug: "citrus-fruits",
-          description: "Citrus fruits like oranges and lemons",
-        },
-        {
-          name: "Berries",
-          slug: "berries",
-          description: "Different kinds of berries",
-        },
-      ],
-    },
-  ]);
+  const [formData, setFormData] = useState({} as FormData);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await api.getListCategory(currentUser._id);
+        if (res.data) {
+          setCategories(res.data);
+          // set all text fields to empty
+        }
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    };
+    fetchCategories();
+  }, [currentUser._id]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -65,17 +85,103 @@ export default function DashAddProduct() {
       setImageUrl(URL.createObjectURL(file));
     }
   };
+  const selectedCategory = categories.find(
+    (cat) => cat._id === formData.category
+  );
+
+  const handleUpload = async () => {
+    setLoading(true);
+    if (!image) {
+      setLoading(false);
+      return;
+    }
+    uploadFileToS3(
+      "products",
+      image,
+      s3Config,
+      (url: string) => {
+        setImageUrl(url);
+        setLoading(false);
+        setFormData({ ...formData, image: url });
+        console.log("Uploaded");
+      },
+      (error: any) => {
+        console.error("Error uploading image", error);
+        setLoading(false);
+      }
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await api.createProduct(formData, currentUser._id);
+      if (res.data) {
+        console.log("Product added successfully", res.data);
+        setLoading(false);
+        setFormData({
+          name: "",
+          stock: 0,
+          description: "",
+          regu_price: 0,
+          prom_price: 0,
+          currency: "USD",
+          tax: 0,
+          width: 0,
+          height: 0,
+          weight: 0,
+          shipping_fee: 0,
+          category: "",
+          tag: "",
+          image: "",
+          isDraft: false,
+          isPublished: false,
+        });
+      } else {
+        setLoading(false);
+        console.log("Failed to add product");
+      }
+    } catch (error) {
+      console.error("Error adding product", error);
+    }
+  };
+
   return (
     <div className="p-12 w-full ">
-      <div className="">
+      <form className="" onSubmit={handleSubmit}>
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-semibold">Add New Product</h1>
 
           <div className="flex items-center gap-2">
-            <Button color={"green"} className="">
-              Save to draft
+            <Button
+              color={"green"}
+              onClick={() => setFormData({ ...formData, isDraft: true })}
+              type="submit"
+            >
+              {loading ? (
+                <div className="">
+                  <Spinner size={"sm"} />
+                  <span className="pl-3">Loading...</span>
+                </div>
+              ) : (
+                "Save to draft"
+              )}
             </Button>
-            <Button className="bg-[#3BB67F]">Publish</Button>
+            <Button
+              onClick={() => setFormData({ ...formData, isPublished: true })}
+              className="bg-[#3BB67F]"
+              type="submit"
+            >
+              {loading ? (
+                <div className="">
+                  <Spinner size={"sm"} />
+                  <span className="pl-3">Loading...</span>
+                </div>
+              ) : (
+                "Publish"
+              )}
+            </Button>
           </div>
         </div>
 
@@ -90,36 +196,59 @@ export default function DashAddProduct() {
                 {/* TITLE */}
                 <div className="space-y-2">
                   <Label>Product title</Label>
-                  <TextInput id="title" placeholder="Type here" />
+                  <TextInput
+                    id="name"
+                    onChange={handleChange}
+                    placeholder="Type here"
+                  />
                 </div>
 
                 {/* QUANTITY */}
                 <div className="space-y-2">
-                  <Label>Product quantity</Label>
-                  <TextInput id="quantity" placeholder="Type here" />
+                  <Label>Product stock</Label>
+                  <TextInput
+                    id="stock"
+                    onChange={handleChange}
+                    placeholder="Type here"
+                  />
                 </div>
 
                 {/* DESCRIPTION */}
                 <div className="space-y-2">
                   <Label>Full description</Label>
-                  <Textarea id="description" rows="6" placeholder="Type here" />
+                  <Textarea
+                    id="description"
+                    onChange={handleChange}
+                    rows="6"
+                    placeholder="Type here"
+                  />
                 </div>
 
                 {/* PRICE */}
                 <div className="grid grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label>Regular price</Label>
-                    <TextInput id="regu-price" placeholder="$" />
+                    <TextInput
+                      onChange={handleChange}
+                      id="regu_price"
+                      placeholder="$"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Promotinal price</Label>
-                    <TextInput id="prom-price" placeholder="$" />
+                    <TextInput
+                      onChange={handleChange}
+                      id="prom_price"
+                      placeholder="$"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Currency</Label>
-                    <Select id="par">
-                      <option>USD</option>
-                      <option>VND</option>
+                    <Select id="currency" onChange={handleChange}>
+                      <option value={"USD"}>USD</option>
+                      <option value={"VND"}>VND</option>
+                      <option value={"EUR"}>EUR</option>
+                      <option value={"JPY"}>JPY</option>
                     </Select>
                   </div>
                 </div>
@@ -127,7 +256,7 @@ export default function DashAddProduct() {
                 {/* TAX */}
                 <div className="space-y-2">
                   <Label>Tax rate</Label>
-                  <TextInput id="tax" placeholder="$" />
+                  <TextInput id="tax" onChange={handleChange} placeholder="$" />
                 </div>
 
                 {/*  */}
@@ -147,20 +276,36 @@ export default function DashAddProduct() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>Width</Label>
-                    <TextInput id="width" placeholder="Inch" />
+                    <TextInput
+                      id="width"
+                      onChange={handleChange}
+                      placeholder="Inch"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Height</Label>
-                    <TextInput id="height" placeholder="Inch" />
+                    <TextInput
+                      onChange={handleChange}
+                      id="height"
+                      placeholder="Inch"
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Weight</Label>
-                  <TextInput id="weight" placeholder="gam" />
+                  <TextInput
+                    onChange={handleChange}
+                    id="weight"
+                    placeholder="gam"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Shipping fees</Label>
-                  <TextInput id="fees" placeholder="$" />
+                  <TextInput
+                    id="shipping_fee"
+                    onChange={handleChange}
+                    placeholder="$"
+                  />
                 </div>
               </div>
             </div>
@@ -176,7 +321,11 @@ export default function DashAddProduct() {
                   onClick={() => imageRef.current?.click()}
                   className="p-20 h-[200px] flex justify-center items-center border-b"
                 >
-                  <img src={uploadIcon} alt="" className="w-[100px]" />
+                  <img
+                    src={imageUrl === "" ? uploadIcon : imageUrl}
+                    alt="image"
+                    className="w-[100px]"
+                  />
                 </div>
                 <input
                   type="file"
@@ -186,7 +335,19 @@ export default function DashAddProduct() {
                   className="hidden"
                 />
                 <div className="flex items-center justify-center mt-4">
-                  <Button className="px-4 inline text-center">Upload</Button>
+                  <Button
+                    className="px-4 inline text-center"
+                    onClick={handleUpload}
+                  >
+                    {loading ? (
+                      <div className="">
+                        <Spinner size={"sm"} />
+                        <span className="pl-3">Loading...</span>
+                      </div>
+                    ) : (
+                      "Upload"
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -199,30 +360,41 @@ export default function DashAddProduct() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>Category</Label>
-                    <Select id="category">
-                      {category.map((item, index) => (
-                        <option key={index}>{item.name}</option>
+                    <Select id="category" onChange={handleChange}>
+                      {categories.map((category) => (
+                        <option key={category._id} value={category._id}>
+                          {category.name}
+                        </option>
                       ))}
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Sub-category</Label>
-                    <Select id="sub-category">
-                      {category.map((item, index) => (
-                        <option key={index}>{item.slug}</option>
-                      ))}
+                    <Select id="sub-category" onChange={handleChange}>
+                      <option value="">None</option>
+                      {selectedCategory &&
+                        selectedCategory.subCategories &&
+                        selectedCategory.subCategories.map((subCategory) => (
+                          <option key={subCategory._id} value={subCategory._id}>
+                            {subCategory.name}
+                          </option>
+                        ))}
                     </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Tags</Label>
-                  <TextInput id="tag" placeholder="Type here" />
+                  <TextInput
+                    onChange={handleChange}
+                    id="tag"
+                    placeholder="Type here"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

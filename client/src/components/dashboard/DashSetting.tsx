@@ -115,6 +115,7 @@ const Profile = () => {
     }
 
     uploadFileToS3(
+      "avatar",
       image,
       params,
       (url: string) => {

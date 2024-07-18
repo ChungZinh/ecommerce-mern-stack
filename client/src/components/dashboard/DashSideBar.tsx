@@ -18,7 +18,6 @@ import {
 import { HiWallet } from "react-icons/hi2";
 import { MdComment, MdStars } from "react-icons/md";
 
-
 export default function DashSideBar() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const dispatch = useDispatch();
@@ -38,14 +37,13 @@ export default function DashSideBar() {
     <Sidebar className="w-full border-r bg-white border-neutral-200">
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Sidebar.Item
-            active={tab === "dashboard"}
-            icon={HiChartPie}
-          >
+          <Sidebar.Item active={tab === "dashboard"} icon={HiChartPie}>
             <Link to={"/dashboard?tab=dashboard"}>Dashboard</Link>
           </Sidebar.Item>
           <Sidebar.Collapse icon={HiShoppingBag} label="Products">
-            <Sidebar.Item href="#">Product List</Sidebar.Item>
+            <Sidebar.Item href="#" active={tab === "product_list"}>
+              <Link to={"/dashboard?tab=product_list"}>Product List</Link>
+            </Sidebar.Item>
             <Sidebar.Item href="#">Product Gird</Sidebar.Item>
             <Sidebar.Item href="#" active={tab === "categories"}>
               <Link to={"/dashboard?tab=categories"}>Categories</Link>
@@ -61,10 +59,7 @@ export default function DashSideBar() {
             <Sidebar.Item href="#">Sellers list</Sidebar.Item>
             <Sidebar.Item href="#">Sellers profile</Sidebar.Item>
           </Sidebar.Collapse>
-          <Sidebar.Item
-            active={tab === "addProduct"}
-            icon={HiViewGridAdd}
-          >
+          <Sidebar.Item active={tab === "addProduct"} icon={HiViewGridAdd}>
             <Link to={"/dashboard?tab=addProduct"}>Add Product</Link>
           </Sidebar.Item>
           <Sidebar.Collapse icon={HiCurrencyDollar} label="Transactions">
@@ -75,22 +70,13 @@ export default function DashSideBar() {
             <Sidebar.Item href="#">Account list 1</Sidebar.Item>
             <Sidebar.Item href="#">Account list 1</Sidebar.Item>
           </Sidebar.Collapse>
-          <Sidebar.Item
-            active={tab === "review"}
-            icon={MdComment}
-          >
+          <Sidebar.Item active={tab === "review"} icon={MdComment}>
             <Link to={"/dashboard?tab=review"}>Reviews</Link>
           </Sidebar.Item>
-          <Sidebar.Item
-            active={tab === "brand"}
-            icon={MdStars}
-          >
+          <Sidebar.Item active={tab === "brand"} icon={MdStars}>
             <Link to={"/dashboard?tab=brand"}>Brands</Link>
           </Sidebar.Item>
-          <Sidebar.Item
-            active={tab === "stactistic"}
-            icon={HiChartBar}
-          >
+          <Sidebar.Item active={tab === "stactistic"} icon={HiChartBar}>
             <Link to={"/dashboard?tab=stactistic"}>Stactistics</Link>
           </Sidebar.Item>
         </Sidebar.ItemGroup>
@@ -103,10 +89,7 @@ export default function DashSideBar() {
               <Link to={"/dashboard?tab=setting"}>Setting sample 2</Link>
             </Sidebar.Item>
           </Sidebar.Collapse>
-          <Sidebar.Item
-            active={tab === "stactistic"}
-            icon={HiTag}
-          >
+          <Sidebar.Item active={tab === "stactistic"} icon={HiTag}>
             <Link to={"/dashboard?tab=stactistic"}>Starter Page</Link>
           </Sidebar.Item>
         </Sidebar.ItemGroup>

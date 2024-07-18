@@ -17,6 +17,25 @@ interface FormData {
   email: string;
 }
 
+interface Product {
+  name: string;
+  stock: number;
+  description: string;
+  regu_price: number;
+  prom_price: number;
+  currency: string;
+  tax: number;
+  width: number;
+  height: number;
+  weight: number;
+  shipping_fee: number;
+  category: string;
+  tag: string;
+  image: string;
+  isDraft: boolean;
+  isPublished: boolean;
+}
+
 interface Category {
   _id: string;
   name: string;
@@ -128,6 +147,17 @@ export const api = {
   getListCategory: (userId: string): Promise<ApiResponse<Category[]>> =>
     request<ApiResponse<Category[]>>(`/category/getList`, {
       method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+  createProduct: (
+    formData: Product,
+    userId: string
+  ): Promise<ApiResponse<Product>> =>
+    request<ApiResponse<Product>>(`/product/create`, {
+      method: "POST",
+      body: JSON.stringify(formData),
       headers: {
         "x-client-id": userId,
       },

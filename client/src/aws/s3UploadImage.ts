@@ -10,6 +10,7 @@ interface UploadParams {
 }
 
 export const uploadFileToS3 = async (
+  folder: string,
   file: File,
   params: UploadParams,
   onSuccess: (url: string) => void,
@@ -26,7 +27,7 @@ export const uploadFileToS3 = async (
 
   const uploadParams = {
     Bucket: bucket,
-    Key: `avatars/${file.name}`,
+    Key: `${folder}/${file.name}`,
     Body: file,
     ContentType: file.type,
   };
