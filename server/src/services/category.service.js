@@ -28,6 +28,13 @@ class CategoryService {
 
     return categories;
   }
+
+  static async getAllSubCategories() {
+    // Get all subCategories
+
+    return await Category.find({}).select('name');
+  }
+
 }
 
 module.exports = CategoryService;

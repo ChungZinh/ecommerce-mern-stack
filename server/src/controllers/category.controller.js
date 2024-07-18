@@ -15,6 +15,13 @@ class CategoryController {
       data: await CategoryService.getList(),
     }).send(res);
   }
+
+  static async getAllSubCategories(req, res, next) {
+    new SuccessResponse({
+      message: "All sub categories",
+      data: await CategoryService.getAllSubCategories(),
+    }).send(res);
+  }
 }
 
 module.exports = CategoryController;
