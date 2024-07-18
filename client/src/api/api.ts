@@ -145,7 +145,7 @@ export const api = {
     }),
 
   getListCategory: (userId: string): Promise<ApiResponse<Category[]>> =>
-    request<ApiResponse<Category[]>>(`/category/getList`, {
+    request<ApiResponse<Category[]>>(`/category/get-list`, {
       method: "GET",
       headers: {
         "x-client-id": userId,
@@ -158,6 +158,16 @@ export const api = {
     request<ApiResponse<Product>>(`/product/create`, {
       method: "POST",
       body: JSON.stringify(formData),
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+  getProductsList: (
+    userId: string,
+    query: string
+  ): Promise<ApiResponse<Product[]>> =>
+    request<ApiResponse<Product[]>>(`/product/get-products-list${query}`, {
+      method: "GET",
       headers: {
         "x-client-id": userId,
       },
