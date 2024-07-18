@@ -8,6 +8,13 @@ class CategoryController {
       data: await CategoryService.create(req.body),
     }).send(res);
   }
+
+  static async getList(req, res, next) {
+    new SuccessResponse({
+      message: "Category list",
+      data: await CategoryService.getList(),
+    }).send(res);
+  }
 }
 
 module.exports = CategoryController;

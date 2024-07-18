@@ -6,4 +6,5 @@ const CategoryController = require("../controllers/category.controller");
 
 router.use(require("../auth/authUtils").verifyToken);
 router.post("/create", asyncHandler(CategoryController.create));
+router.get("/getList", asyncHandler(CategoryController.getList));
 module.exports = router;
