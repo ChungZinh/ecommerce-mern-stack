@@ -19,6 +19,9 @@ var categorySchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    image: {
+      type: String,
+    },
     parentCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -37,17 +40,16 @@ var categorySchema = new mongoose.Schema(
   }
 );
 
-
-categorySchema.pre('save', async function(next) {
-    if (this.parentCategory) {
-      const parent = await Category.findById(this.parentCategory);
-      if (parent) {
-        parent.subCategories.push(this._id);
-        await parent.save();
-      }
+categorySchema.pre("save", async function (next) {
+  if (this.parentCategory) {
+    const parent = await Category.findById(this.parentCategory);
+    if (parent) {
+      parent.subCategories.push(this._id);
+      await parent.save();
     }
-    next();
-  });
+  }
+  next();
+});
 
 //Export the model
 module.exports = mongoose.model(DOCUMENT_NAME, categorySchema);
