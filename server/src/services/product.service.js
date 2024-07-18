@@ -24,6 +24,7 @@ class ProductService {
         ],
       }),
     })
+      .populate("category", "name")
       .sort({ createdAt: sortDirection })
       .skip((page - 1) * limit)
       .limit(limit);
