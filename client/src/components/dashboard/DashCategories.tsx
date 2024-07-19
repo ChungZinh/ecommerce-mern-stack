@@ -2,6 +2,7 @@ import {
   Button,
   Checkbox,
   Label,
+  Modal,
   Select,
   Spinner,
   Table,
@@ -13,11 +14,12 @@ import { RootState } from "../../redux/store";
 import { ChangeEvent, useEffect, useState } from "react";
 import { api } from "../../api/api";
 import { buildQueryString } from "../../utils/buildQueryString";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 interface FormData {
   name: string;
   slug: string;
-  parent: string;
+  parentCategory: string;
   description: string;
 }
 interface Category {
@@ -39,6 +41,8 @@ export default function DashCategories() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState(false);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -61,18 +65,19 @@ export default function DashCategories() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Category created");
+
     setLoading(true);
     try {
       const res = await api.createCategory(formData, currentUser._id);
       if (res.data) {
         setCategories((prevCategories) => [...prevCategories, res.data]);
-        //set form data is empty
         setLoading(false);
         if (loading === false) {
           setFormData({
             name: "",
             slug: "",
-            parent: "",
+            parentCategory: "",
             description: "",
           });
         }
@@ -83,10 +88,14 @@ export default function DashCategories() {
     }
   };
 
+
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setPage(pageNumber);
-      setQuery(`?page=${pageNumber}`);
+      setQuery((prevQuery) => ({
+        ...prevQuery,
+        page: pageNumber,
+      }));
     }
   };
 
@@ -127,6 +136,21 @@ export default function DashCategories() {
       console.log("Error updating category", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      const res = await api.deleteCategory(currentUser._id, categoryId);
+      if (res.data) {
+        setCategories((prevCategories) =>
+          prevCategories.filter((category) => category._id !== categoryId)
+        );
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.error("Error deleting category", error);
+    }
+  };
+
   return (
     <div className="p-10 w-full ">
       <div className="">
@@ -185,7 +209,7 @@ export default function DashCategories() {
                   <Label>Category parent</Label>
                   <Select
                     id="parentCategory"
-                    value={formData.parent}
+                    value={formData.parentCategory}
                     onChange={handleChange}
                   >
                     <option value={""}>None</option>
@@ -238,8 +262,8 @@ export default function DashCategories() {
                     <Table.HeadCell>Actions</Table.HeadCell>
                   </Table.Head>
                   <Table.Body>
-                    {categories.map((category) => (
-                      <Table.Row key={categories._id}>
+                    {categories.map((category, index) => (
+                      <Table.Row key={index}>
                         <Table.Cell>
                           <Checkbox color={"green"} />
                         </Table.Cell>
@@ -256,7 +280,14 @@ export default function DashCategories() {
                             >
                               Edit
                             </Button>
-                            <Button size={"sm"} color={"green"}>
+                            <Button
+                              onClick={() => {
+                                setShowModal(true);
+                                setCategoryId(category._id);
+                              }}
+                              size={"sm"}
+                              color={"green"}
+                            >
                               Delete
                             </Button>
                           </div>
@@ -305,6 +336,28 @@ export default function DashCategories() {
           </div>
         </div>
       </div>
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <HiOutlineExclamationCircle className="text-5xl text-red-500 mx-auto" />
+          <p className="text-center text-gray-500 mt-4">
+            Are you sure you want to delete this category ?
+          </p>
+          <div className="flex justify-between mt-5">
+            <Button color="failure" onClick={handleDelete}>
+              Yes, I'm sure
+            </Button>
+            <Button color="gray" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

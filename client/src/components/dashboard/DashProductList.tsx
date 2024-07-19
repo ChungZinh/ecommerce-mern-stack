@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  Modal,
   Select,
   Spinner,
   Table,
@@ -14,6 +15,7 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { formatCreatedAt } from "../../utils/formatDate";
 import { Link } from "react-router-dom";
 import { buildQueryString } from "../../utils/buildQueryString";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 interface Product {
   name: string;
@@ -51,12 +53,14 @@ export default function DashProductList() {
   const [cQuery, setCQuery] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
+  const [productId, setProductId] = useState<string>("");
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const queryB = buildQueryString(query)
+        const queryB = buildQueryString(query);
         const res = await api.getProductsList(currentUser._id, queryB);
         if (res.data.products) {
           setProducts(res.data.products);
@@ -84,8 +88,6 @@ export default function DashProductList() {
     fetchProducts();
   }, [currentUser._id, query]);
 
-
-
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setPage(pageNumber);
@@ -111,6 +113,8 @@ export default function DashProductList() {
     }));
   };
 
+  const handleDelete = async () => {};
+
   return (
     <div className="p-12 w-full ">
       <div className="">
@@ -135,7 +139,10 @@ export default function DashProductList() {
           >
             <div className="">
               <div className="py-2 border-b w-full flex items-center justify-between">
-                <TextInput placeholder="Search..." onChange={handleSearchTerm} />
+                <TextInput
+                  placeholder="Search..."
+                  onChange={handleSearchTerm}
+                />
                 <div className="">
                   <Select onChange={handleFilterCategory}>
                     <option value={""}>All category</option>
@@ -202,7 +209,14 @@ export default function DashProductList() {
                             <Button size={"sm"} className="bg-[#3BB67F]">
                               Edit
                             </Button>
-                            <Button size={"sm"} color={"green"}>
+                            <Button
+                              size={"sm"}
+                              color={"green"}
+                              onClick={() => {
+                                setShowModal(true);
+                                setProductId(product._id);
+                              }}
+                            >
                               Delete
                             </Button>
                           </div>
@@ -248,6 +262,28 @@ export default function DashProductList() {
           </div>
         </div>
       </div>
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <HiOutlineExclamationCircle className="text-5xl text-red-500 mx-auto" />
+          <p className="text-center text-gray-500 mt-4">
+            Are you sure you want to delete this product ?
+          </p>
+          <div className="flex justify-between mt-5">
+            <Button color="failure" onClick={handleDelete}>
+              Yes, I'm sure
+            </Button>
+            <Button color="gray" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

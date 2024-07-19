@@ -40,14 +40,14 @@ interface Category {
   _id: string;
   name: string;
   slug: string;
-  parent: string;
+  parentCategory: string;
   description: string;
 }
 
 interface ApiResponse<T> {
   data: T;
   message?: string;
-  statusText?: string;
+  statusCode?: number;
 }
 
 interface SignInResponse {
@@ -144,7 +144,10 @@ export const api = {
       },
     }),
 
-  getListCategory: (userId: string, query:string): Promise<ApiResponse<Category[]>> =>
+  getListCategory: (
+    userId: string,
+    query: string
+  ): Promise<ApiResponse<Category[]>> =>
     request<ApiResponse<Category[]>>(`/category/get-list${query}`, {
       method: "GET",
       headers: {
@@ -172,11 +175,26 @@ export const api = {
         "x-client-id": userId,
       },
     }),
-  
-  updateCategory: (userId: string, categoryId: string, formData: Category): Promise<ApiResponse<Category>> =>
+
+  updateCategory: (
+    userId: string,
+    categoryId: string,
+    formData: Category
+  ): Promise<ApiResponse<Category>> =>
     request<ApiResponse<Category>>(`/category/update/${categoryId}`, {
       method: "PUT",
       body: JSON.stringify(formData),
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
+  deleteCategory: (
+    userId: string,
+    categoryId: string
+  ): Promise<ApiResponse<Category>> =>
+    request<ApiResponse<Category>>(`/category/delete/${categoryId}`, {
+      method: "DELETE",
       headers: {
         "x-client-id": userId,
       },
