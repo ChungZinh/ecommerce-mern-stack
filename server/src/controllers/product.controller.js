@@ -15,10 +15,10 @@ class ProductController {
     }).send(res);
   }
 
-  static async deleteProduct(req, res, next) {
+  static async moveToDraft(req, res, next) {
     new CreatedResponse({
       message: "Product deleted successfully",
-      data: await ProductService.deleteProduct(req),
+      data: await ProductService.moveToDraft(req),
     }).send(res);
   }
 }

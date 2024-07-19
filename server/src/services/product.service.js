@@ -56,7 +56,7 @@ class ProductService {
     };
   }
 
-  static async deleteProduct(req) {
+  static async moveToDraft(req) {
     const product = await Product.findById(req.params.id);
     if (!product) {
       throw new NotFoundResponse("Product not found");
