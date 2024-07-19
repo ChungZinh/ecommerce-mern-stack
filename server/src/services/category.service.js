@@ -91,6 +91,18 @@ class CategoryService {
 
     return updatedCategory;
   }
+
+  static async deleteCategory(req) {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      throw new NotFoundResponse("Category not found");
+    }
+
+    await Category.findByIdAndDelete(req.params.id);
+
+    return category;
+  }
 }
 
 module.exports = CategoryService;

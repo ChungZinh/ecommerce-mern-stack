@@ -22,6 +22,13 @@ class CategoryController {
       data: await CategoryService.updateCategory(req),
     }).send(res);
   }
+
+  static async delete(req, res, next) {
+    new SuccessResponse({
+      message: "Category deleted successfully",
+      data: await CategoryService.deleteCategory(req),
+    }).send(res);
+  }
 }
 
 module.exports = CategoryController;
