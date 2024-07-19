@@ -198,6 +198,7 @@ export default function DashAddProduct() {
                   <Label>Product title</Label>
                   <TextInput
                     id="name"
+                    value={formData.name}
                     onChange={handleChange}
                     placeholder="Type here"
                   />
@@ -208,6 +209,7 @@ export default function DashAddProduct() {
                   <Label>Product stock</Label>
                   <TextInput
                     id="stock"
+                    value={formData.stock}
                     onChange={handleChange}
                     placeholder="Type here"
                   />
@@ -218,6 +220,7 @@ export default function DashAddProduct() {
                   <Label>Full description</Label>
                   <Textarea
                     id="description"
+                    value={formData.description}
                     onChange={handleChange}
                     rows="6"
                     placeholder="Type here"
@@ -230,6 +233,7 @@ export default function DashAddProduct() {
                     <Label>Regular price</Label>
                     <TextInput
                       onChange={handleChange}
+                      value={formData.regu_price}
                       id="regu_price"
                       placeholder="$"
                     />
@@ -238,13 +242,18 @@ export default function DashAddProduct() {
                     <Label>Promotinal price</Label>
                     <TextInput
                       onChange={handleChange}
+                      value={formData.prom_price}
                       id="prom_price"
                       placeholder="$"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Currency</Label>
-                    <Select id="currency" onChange={handleChange}>
+                    <Select
+                      id="currency"
+                      value={formData.currency}
+                      onChange={handleChange}
+                    >
                       <option value={"USD"}>USD</option>
                       <option value={"VND"}>VND</option>
                       <option value={"EUR"}>EUR</option>
@@ -256,7 +265,12 @@ export default function DashAddProduct() {
                 {/* TAX */}
                 <div className="space-y-2">
                   <Label>Tax rate</Label>
-                  <TextInput id="tax" onChange={handleChange} placeholder="$" />
+                  <TextInput
+                    id="tax"
+                    value={formData.tax}
+                    onChange={handleChange}
+                    placeholder="$"
+                  />
                 </div>
 
                 {/*  */}
@@ -278,6 +292,7 @@ export default function DashAddProduct() {
                     <Label>Width</Label>
                     <TextInput
                       id="width"
+                      value={formData.width}
                       onChange={handleChange}
                       placeholder="Inch"
                     />
@@ -286,6 +301,7 @@ export default function DashAddProduct() {
                     <Label>Height</Label>
                     <TextInput
                       onChange={handleChange}
+                      value={formData.height}
                       id="height"
                       placeholder="Inch"
                     />
@@ -295,6 +311,7 @@ export default function DashAddProduct() {
                   <Label>Weight</Label>
                   <TextInput
                     onChange={handleChange}
+                    value={formData.weight}
                     id="weight"
                     placeholder="gam"
                   />
@@ -304,6 +321,7 @@ export default function DashAddProduct() {
                   <TextInput
                     id="shipping_fee"
                     onChange={handleChange}
+                    value={formData.shipping_fee}
                     placeholder="$"
                   />
                 </div>
@@ -361,6 +379,7 @@ export default function DashAddProduct() {
                   <div className="space-y-2">
                     <Label>Category</Label>
                     <Select id="category" onChange={handleChange}>
+                      <option value="">None</option>
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>
                           {category.name}
