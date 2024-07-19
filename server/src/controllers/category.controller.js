@@ -16,6 +16,12 @@ class CategoryController {
     }).send(res);
   }
 
+  static async update(req, res, next) {
+    new SuccessResponse({
+      message: "Category",
+      data: await CategoryService.updateCategory(req),
+    }).send(res);
+  }
 }
 
 module.exports = CategoryController;

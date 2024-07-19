@@ -1,3 +1,4 @@
+const { NotFoundResponse } = require("../core/error.response");
 const Category = require("../models/category.model");
 
 class CategoryService {
@@ -19,15 +20,6 @@ class CategoryService {
 
     return category;
   }
-
-  // static async getList() {
-  //   // Get all categories have subCategories not empty
-  //   const categories = await Category.find({
-  //     subCategories: { $exists: true, $not: { $size: 0 } }, // check if subCategories is not empty
-  //   }).populate("subCategories", "name"); // get only name of subCategories
-
-  //   return categories;
-  // }
 
   static async getList(req) {
     const page = parseInt(req.query.page) || 1;
@@ -74,6 +66,30 @@ class CategoryService {
       totalCategories,
       lastMonthPosts,
     };
+  }
+
+  static async updateCategory(req) {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      throw new NotFoundResponse("Category not found");
+    }
+
+    const { name, slug, description, parentCategory, subCategories } = req.body;
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        slug,
+        description,
+        parentCategory,
+        subCategories,
+      },
+      { new: true }
+    );
+
+    return updatedCategory;
   }
 }
 
