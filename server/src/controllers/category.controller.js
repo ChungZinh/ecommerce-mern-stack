@@ -12,7 +12,7 @@ class CategoryController {
   static async getList(req, res, next) {
     new SuccessResponse({
       message: "Category list",
-      data: await CategoryService.getList(),
+      data: await CategoryService.getList(req),
     }).send(res);
   }
 
