@@ -176,6 +176,28 @@ export const api = {
       },
     }),
 
+  moveToDraft: (
+    userId: string,
+    productId: string
+  ): Promise<ApiResponse<Product>> =>
+    request<ApiResponse<Product>>(`/product/move-to-draft/${productId}`, {
+      method: "PUT",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
+  publishProduct: (
+    userId: string,
+    productId: string
+  ): Promise<ApiResponse<Product>> =>
+    request<ApiResponse<Product>>(`/product/publish-product/${productId}`, {
+      method: "PUT",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
   updateCategory: (
     userId: string,
     categoryId: string,

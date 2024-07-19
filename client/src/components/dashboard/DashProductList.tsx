@@ -53,8 +53,9 @@ export default function DashProductList() {
   const [cQuery, setCQuery] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [showModal, setShowModal] = useState(false);
   const [productId, setProductId] = useState<string>("");
+  const [actionType, setActionType] = useState<string | null>(null); // 'publish' or 'draft'
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -86,7 +87,7 @@ export default function DashProductList() {
     fetchCategories();
 
     fetchProducts();
-  }, [currentUser._id, query]);
+  }, [currentUser._id, query, showModal]);
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -105,6 +106,24 @@ export default function DashProductList() {
     }));
   };
 
+  const handleFilterState = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    let newFilter = {};
+
+    if (value === "isDraft") {
+      newFilter = { isDraft: true };
+    } else if (value === "isPublished") {
+      newFilter = { isPublished: true };
+    }
+
+    // Update query state by spreading newFilter directly into the query object
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      ...newFilter, // Correctly merge newFilter into the query object
+    }));
+    // Update query state
+  };
+
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setQuery((prevQuery) => ({
@@ -113,7 +132,37 @@ export default function DashProductList() {
     }));
   };
 
-  const handleDelete = async () => {};
+  const handleMTDraft = async () => {
+    try {
+      const res = await api.moveToDraft(currentUser._id, productId);
+      if (res.data) {
+        setActionType("draft");
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePublishP = async () => {
+    try {
+      const res = await api.publishProduct(currentUser._id, productId);
+      if (res.data) {
+        setActionType("publish");
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAction = () => {
+    if (actionType === "publish") {
+      handlePublishP();
+    } else if (actionType === "draft") {
+      handleMTDraft();
+    }
+  };
 
   return (
     <div className="p-12 w-full ">
@@ -143,7 +192,13 @@ export default function DashProductList() {
                   placeholder="Search..."
                   onChange={handleSearchTerm}
                 />
-                <div className="">
+                <div className="flex items-center gap-2">
+                  <Select onChange={handleFilterState}>
+                    <option value="">All State</option>
+                    <option value="isDraft">Draft</option>
+                    <option value="isPublished">Published</option>
+                  </Select>
+
                   <Select onChange={handleFilterCategory}>
                     <option value={""}>All category</option>
                     {categories.map((category, index) => (
@@ -213,11 +268,14 @@ export default function DashProductList() {
                               size={"sm"}
                               color={"green"}
                               onClick={() => {
-                                setShowModal(true);
                                 setProductId(product._id);
+                                setActionType(
+                                  product.isDraft ? "publish" : "draft"
+                                );
+                                setShowModal(true);
                               }}
                             >
-                              Delete
+                              {product.isDraft ? "Publish" : "Draft"}
                             </Button>
                           </div>
                         </Table.Cell>
@@ -272,10 +330,12 @@ export default function DashProductList() {
         <Modal.Body>
           <HiOutlineExclamationCircle className="text-5xl text-red-500 mx-auto" />
           <p className="text-center text-gray-500 mt-4">
-            Are you sure you want to delete this product ?
+            Are you sure you want to{" "}
+            {actionType === "publish" ? "publish" : "move to draft"} this
+            product?
           </p>
           <div className="flex justify-between mt-5">
-            <Button color="failure" onClick={handleDelete}>
+            <Button color="failure" onClick={handleAction}>
               Yes, I'm sure
             </Button>
             <Button color="gray" onClick={() => setShowModal(false)}>
