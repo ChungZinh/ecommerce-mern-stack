@@ -13,6 +13,7 @@ import { api } from "../../api/api";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { formatCreatedAt } from "../../utils/formatDate";
 import { Link } from "react-router-dom";
+import { buildQueryString } from "../../utils/buildQueryString";
 
 interface Product {
   name: string;
@@ -83,15 +84,7 @@ export default function DashProductList() {
     fetchProducts();
   }, [currentUser._id, query]);
 
-  const buildQueryString = (queryObject: { [key: string]: any }) => {
-    const queryString = Object.keys(queryObject)
-      .map(
-        (key) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(queryObject[key])}`
-      )
-      .join("&");
-    return `?${queryString}`;
-  };
+
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {

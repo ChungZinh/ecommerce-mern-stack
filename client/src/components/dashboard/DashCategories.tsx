@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { ChangeEvent, useEffect, useState } from "react";
 import { api } from "../../api/api";
+import { buildQueryString } from "../../utils/buildQueryString";
 
 interface FormData {
   name: string;
@@ -35,6 +36,7 @@ export default function DashCategories() {
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -43,7 +45,8 @@ export default function DashCategories() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.getListCategory(currentUser._id, query);
+        const sQuery = buildQueryString(query);
+        const res = await api.getListCategory(currentUser._id, sQuery);
         if (res.data) {
           setCategories(res.data.categories);
           setTotalPages(res.data.totalPages);
@@ -86,6 +89,14 @@ export default function DashCategories() {
     }
   };
 
+  const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      searchTerm: e.target.value,
+    }));
+  };
+
   return (
     <div className="p-10 w-full ">
       <div className="">
@@ -97,7 +108,7 @@ export default function DashCategories() {
             </p>
           </div>
 
-          <TextInput placeholder="Serach category" className="mt-8" />
+          <TextInput placeholder="Serach category" onChange={handleSearchTerm} className="mt-8" />
         </div>
 
         <div className="w-full mt-8 lg:flex lg:gap-8">
