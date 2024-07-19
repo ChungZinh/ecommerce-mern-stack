@@ -7,4 +7,5 @@ router.use(require("../auth/authUtils").verifyToken);
 router.post("/create", asyncHandler(ProductController.createProduct));
 router.get("/get-products-list", asyncHandler(ProductController.getProductsList));
 router.put("/move-to-draft/:id", asyncHandler(ProductController.moveToDraft));
+router.put("/publish-product/:id", asyncHandler(ProductController.publishProduct));
 module.exports = router;

@@ -21,6 +21,13 @@ class ProductController {
       data: await ProductService.moveToDraft(req),
     }).send(res);
   }
+
+  static async publishProduct(req, res, next) {
+    new CreatedResponse({
+      message: "Product published successfully",
+      data: await ProductService.publishProduct(req),
+    }).send(res);
+  }
 }
 
 module.exports = ProductController;

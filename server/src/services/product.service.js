@@ -66,6 +66,23 @@ class ProductService {
       req.params.id,
       {
         isDraft: true,
+        isPublished: false,
+      },
+      { new: true }
+    );
+  }
+
+  static async publishProduct(req) {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      throw new NotFoundResponse("Product not found");
+    }
+
+    return await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        isDraft: false,
+        isPublished: true,
       },
       { new: true }
     );
