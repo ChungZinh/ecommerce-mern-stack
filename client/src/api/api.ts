@@ -172,4 +172,13 @@ export const api = {
         "x-client-id": userId,
       },
     }),
+  
+  updateCategory: (userId: string, categoryId: string, formData: Category): Promise<ApiResponse<Category>> =>
+    request<ApiResponse<Category>>(`/category/update/${categoryId}`, {
+      method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
 };

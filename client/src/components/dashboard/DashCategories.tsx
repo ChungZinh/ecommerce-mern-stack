@@ -37,7 +37,8 @@ export default function DashCategories() {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
-
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [editMode, setEditMode] = useState<boolean>(false);
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -56,7 +57,7 @@ export default function DashCategories() {
       }
     };
     fetchCategories();
-  }, [currentUser._id, query]);
+  }, [currentUser._id, query, editMode]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,6 +98,35 @@ export default function DashCategories() {
     }));
   };
 
+  const handleEdit = (c: Category) => {
+    setFormData(c);
+    setCategoryId(c._id);
+    setEditMode(true);
+  };
+
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await api.updateCategory(
+        currentUser._id,
+        categoryId,
+        formData
+      );
+      if (res.data) {
+        setEditMode(false);
+        setFormData({
+          name: "",
+          slug: "",
+          parent: "",
+          description: "",
+        });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("Error updating category", error);
+    }
+  };
   return (
     <div className="p-10 w-full ">
       <div className="">
@@ -108,13 +138,31 @@ export default function DashCategories() {
             </p>
           </div>
 
-          <TextInput placeholder="Serach category" onChange={handleSearchTerm} className="mt-8" />
+          <TextInput
+            placeholder="Serach category"
+            onChange={handleSearchTerm}
+            className="mt-8"
+          />
         </div>
 
         <div className="w-full mt-8 lg:flex lg:gap-8">
           <div className="lg:w-1/4 ">
             <div className=" bg-white mb-6  p-6 rounded-md shadow-md">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form
+                onSubmit={editMode ? handleUpdate : handleSubmit}
+                className="space-y-4"
+              >
+                {editMode && (
+                  <div className="space-y-2">
+                    <Label>Category Id</Label>
+                    <TextInput
+                      id="name"
+                      value={formData._id}
+                      disabled
+                      placeholder="Type here"
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label>Category name</Label>
                   <TextInput
@@ -136,13 +184,15 @@ export default function DashCategories() {
                 <div className="space-y-2">
                   <Label>Category parent</Label>
                   <Select
-                    id="parent"
+                    id="parentCategory"
                     value={formData.parent}
                     onChange={handleChange}
                   >
                     <option value={""}>None</option>
                     {categories.map((category) => (
-                      <option key={category._id}>{category.name}</option>
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
                     ))}
                   </Select>
                 </div>
@@ -164,7 +214,7 @@ export default function DashCategories() {
                       <span className="pl-3">Loading...</span>
                     </div>
                   ) : (
-                    "Create Category"
+                    <>{editMode ? "Update Category" : "Create Category"}</>
                   )}
                 </Button>
               </form>
@@ -198,7 +248,18 @@ export default function DashCategories() {
                         <Table.Cell>{category.parentCategory}</Table.Cell>
                         <Table.Cell>{category.description}</Table.Cell>
                         <Table.Cell>
-                          <Button color={"green"}>Edit</Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size={"sm"}
+                              className="bg-[#3BB67F]"
+                              onClick={() => handleEdit(category)}
+                            >
+                              Edit
+                            </Button>
+                            <Button size={"sm"} color={"green"}>
+                              Delete
+                            </Button>
+                          </div>
                           {/* <Button color={'red'}>Delete</Button> */}
                         </Table.Cell>
                       </Table.Row>
