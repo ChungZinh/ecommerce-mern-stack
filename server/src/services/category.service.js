@@ -29,10 +29,51 @@ class CategoryService {
   //   return categories;
   // }
 
-  static async getList() {
-    // Get all subCategories
+  static async getList(req) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
 
-    return await Category.find().populate("subCategories", "name");
+    const categories = await Category.find({
+      ...(req.query.parentCategory && {
+        parentCategory: req.query.parentCategory,
+      }),
+      ...(req.query.slug && { slug: req.query.slug }),
+      ...(req.query.categoryId && { _id: req.query.categoryId }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { name: { $regex: req.query.searchTerm, $options: "i" } },
+          { description: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .populate("subCategories", "name")
+      .sort({ createdAt: sortDirection })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalCategories = await Category.countDocuments();
+
+    const totalPages = Math.ceil(totalCategories / limit);
+
+    const timeNow = new Date();
+
+    const oneMonthAgo = new Date(
+      timeNow.getFullYear(),
+      timeNow.getMonth() - 1,
+      timeNow.getDate()
+    );
+
+    const lastMonthPosts = await Product.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    return {
+      categories,
+      totalPages,
+      totalCategories,
+      lastMonthPosts,
+    };
   }
 }
 
