@@ -1,3 +1,4 @@
+const { NotFoundResponse } = require("../core/error.response");
 const Product = require("../models/product.model");
 const { create } = require("./category.service");
 class ProductService {
@@ -17,6 +18,8 @@ class ProductService {
       ...(req.query.category && { category: req.query.category }),
       ...(req.query.slug && { slug: req.query.slug }),
       ...(req.query.productId && { _id: req.query.productId }),
+      ...(req.query.isDraft && { isDraft: req.query.isDraft }),
+      ...(req.query.isPublished && { isPublished: req.query.isPublished }),
       ...(req.query.searchTerm && {
         $or: [
           { name: { $regex: req.query.searchTerm, $options: "i" } },
@@ -51,6 +54,21 @@ class ProductService {
       totalProducts,
       lastMonthPosts,
     };
+  }
+
+  static async deleteProduct(req) {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      throw new NotFoundResponse("Product not found");
+    }
+
+    return await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        isDraft: true,
+      },
+      { new: true }
+    );
   }
 }
 

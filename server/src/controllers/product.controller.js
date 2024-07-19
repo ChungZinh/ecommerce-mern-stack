@@ -14,6 +14,13 @@ class ProductController {
       data: await ProductService.getProductsList(req),
     }).send(res);
   }
+
+  static async deleteProduct(req, res, next) {
+    new CreatedResponse({
+      message: "Product deleted successfully",
+      data: await ProductService.deleteProduct(req),
+    }).send(res);
+  }
 }
 
 module.exports = ProductController;
