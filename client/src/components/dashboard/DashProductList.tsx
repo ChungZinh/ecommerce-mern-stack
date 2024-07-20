@@ -13,7 +13,7 @@ import { RootState } from "../../redux/store";
 import { api } from "../../api/api";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { formatCreatedAt } from "../../utils/formatDate";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { buildQueryString } from "../../utils/buildQueryString";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
@@ -44,6 +44,7 @@ interface Category {
   description: string;
 }
 export default function DashProductList() {
+  const navigate = useNavigate();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [loading, setLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -261,7 +262,17 @@ export default function DashProductList() {
                         </Table.Cell>
                         <Table.Cell>
                           <div className="flex items-center gap-1">
-                            <Button size={"sm"} className="bg-[#3BB67F]">
+                            <Button
+                              onClick={() => {
+                                //navigate to edit product page with product
+
+                                navigate(`/dashboard?tab=editProduct`, {
+                                  state: { product },
+                                });
+                              }}
+                              size={"sm"}
+                              className="bg-[#3BB67F]"
+                            >
                               Edit
                             </Button>
                             <Button

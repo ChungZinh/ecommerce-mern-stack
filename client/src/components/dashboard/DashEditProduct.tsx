@@ -14,6 +14,8 @@ import { RootState } from "../../redux/store";
 import { api } from "../../api/api";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { s3Config } from "../../aws/s3Config";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { HiArrowNarrowLeft } from "react-icons/hi";
 
 interface category {
   name: string;
@@ -50,23 +52,25 @@ interface Category {
   description: string;
   subCategories?: Category[];
 }
-export default function DashAddProduct() {
+export default function DashEditProduct() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { product } = location.state || {};
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const imageRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>("");
-  const [formData, setFormData] = useState({} as FormData);
+  const [formData, setFormData] = useState(product || ({} as FormData));
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [query, setQuery] = useState("");
+  const [qu, setQu] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.getListCategory(currentUser._id, query);
+        const res = await api.getListCategory(currentUser._id, qu);
         if (res.data) {
           setCategories(res.data.categories);
-          // set all text fields to empty
         }
       } catch (error) {
         console.error("Error fetching categories", error);
@@ -86,7 +90,7 @@ export default function DashAddProduct() {
       setImageUrl(URL.createObjectURL(file));
     }
   };
-  const selectedCategory = categories?.find(
+  const selectedCategory = categories.find(
     (cat) => cat._id === formData.category
   );
 
@@ -117,9 +121,9 @@ export default function DashAddProduct() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.createProduct(formData, currentUser._id);
+      const res = await api.updateProduct(formData, currentUser._id);
       if (res.data) {
-        console.log("Product added successfully", res.data);
+        console.log("Product updated successfully", res.data);
         setLoading(false);
         setFormData({
           name: "",
@@ -139,6 +143,8 @@ export default function DashAddProduct() {
           isDraft: false,
           isPublished: false,
         });
+        // go back to product list
+        navigate("/dashboard?tab=product_list");
       } else {
         setLoading(false);
         console.log("Failed to add product");
@@ -149,10 +155,17 @@ export default function DashAddProduct() {
   };
 
   return (
-    <div className="p-12 w-full ">
+    <div className="p-8 w-full ">
+      <Link
+        to="/dashboard?tab=product_list"
+        className="flex items-center gap-2 p-2 rounded-md  mb-4 *:text-[#3BB67F] bg-[#D9F1E4]"
+      >
+        <HiArrowNarrowLeft className="text-xl" />
+        <p>Back</p>
+      </Link>
       <form className="" onSubmit={handleSubmit}>
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">Add New Product</h1>
+          <h1 className="text-3xl font-semibold">Edit Product</h1>
 
           <div className="flex items-center gap-2">
             <Button
@@ -293,7 +306,7 @@ export default function DashAddProduct() {
                     <Label>Width</Label>
                     <TextInput
                       id="width"
-                      value={formData.width}
+                      value={formData.specifications.dimensions.width}
                       onChange={handleChange}
                       placeholder="Inch"
                     />
@@ -302,7 +315,7 @@ export default function DashAddProduct() {
                     <Label>Height</Label>
                     <TextInput
                       onChange={handleChange}
-                      value={formData.height}
+                      value={formData.specifications.dimensions.height}
                       id="height"
                       placeholder="Inch"
                     />
@@ -312,7 +325,7 @@ export default function DashAddProduct() {
                   <Label>Weight</Label>
                   <TextInput
                     onChange={handleChange}
-                    value={formData.weight}
+                    value={formData.specifications.weight}
                     id="weight"
                     placeholder="gam"
                   />
@@ -341,7 +354,7 @@ export default function DashAddProduct() {
                   className="p-20 h-[200px] flex justify-center items-center border-b"
                 >
                   <img
-                    src={imageUrl === "" ? uploadIcon : imageUrl}
+                    src={imageUrl === "" ? formData.image : imageUrl}
                     alt="image"
                     className="w-[100px]"
                   />
@@ -379,7 +392,11 @@ export default function DashAddProduct() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>Category</Label>
-                    <Select id="category" onChange={handleChange}>
+                    <Select
+                      id="category"
+                      value={formData.category._id}
+                      onChange={handleChange}
+                    >
                       <option value="">None</option>
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>

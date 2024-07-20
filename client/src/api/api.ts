@@ -165,6 +165,19 @@ export const api = {
         "x-client-id": userId,
       },
     }),
+
+  updateProduct: (
+    formData: Product,
+    userId: string
+  ): Promise<ApiResponse<Product>> =>
+    request<ApiResponse<Product>>(`/product/update-product/${formData._id}`, {
+      method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
   getProductsList: (
     userId: string,
     query: string
