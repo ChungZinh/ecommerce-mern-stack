@@ -6,6 +6,13 @@ class ProductService {
     return await Product.create({
       ...data,
       slug: data.name.toLowerCase().split(" ").join("-"),
+      specifications: {
+        weight: data.weight,
+        dimensions: {
+          width: data.width,
+          height: data.height,
+        },
+      },
     });
   }
 
@@ -83,6 +90,22 @@ class ProductService {
       {
         isDraft: false,
         isPublished: true,
+      },
+      { new: true }
+    );
+  }
+
+  static async updateProduct(req) {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      throw new NotFoundResponse("Product not found");
+    }
+
+    return await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...req.body,
+        slug: req.body.name.toLowerCase().split(" ").join("-"),
       },
       { new: true }
     );

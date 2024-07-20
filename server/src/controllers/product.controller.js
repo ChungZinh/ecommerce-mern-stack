@@ -28,6 +28,13 @@ class ProductController {
       data: await ProductService.publishProduct(req),
     }).send(res);
   }
+
+  static async updateProduct(req, res, next) {
+    new CreatedResponse({
+      message: "Product updated successfully",
+      data: await ProductService.updateProduct(req),
+    }).send(res);
+  }
 }
 
 module.exports = ProductController;
