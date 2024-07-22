@@ -1,6 +1,7 @@
 const { NotFoundResponse } = require("../core/error.response");
 const Product = require("../models/product.model");
 const { create } = require("./category.service");
+const { client, topSellingKey } = require("./redis.service");
 class ProductService {
   static async createProduct(data) {
     return await Product.create({
@@ -110,6 +111,32 @@ class ProductService {
       { new: true }
     );
   }
+
+  // REDIS
+
+  static async addTopSellingProduct(req) {
+    const { productId, sales } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new NotFoundResponse("Product not found");
+    }
+
+    client.zAdd(topSellingKey, sales, productId);
+
+    return product;
+  }
+
+  static async getTopSellingProducts() {
+    client.zRevRank(topSellingKey, 0, -1, "WITHSCORES");
+
+    const productDetail = [];
+    for (let i = 0; i < topSellingProducts.length; i += 2) {
+      const product = await Product.findById(topSellingProducts[i]);
+      productDetail.push({ ...product, sales: topSellingProducts[i + 1] });
+    }
+  }
+
+
 }
 
 module.exports = ProductService;
