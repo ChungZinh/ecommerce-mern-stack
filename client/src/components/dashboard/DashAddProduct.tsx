@@ -202,6 +202,7 @@ export default function DashAddProduct() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Type here"
+                    required
                   />
                 </div>
 
@@ -213,6 +214,7 @@ export default function DashAddProduct() {
                     value={formData.stock}
                     onChange={handleChange}
                     placeholder="Type here"
+                    required
                   />
                 </div>
 
@@ -224,6 +226,7 @@ export default function DashAddProduct() {
                     value={formData.description}
                     onChange={handleChange}
                     rows="6"
+                    required
                     placeholder="Type here"
                   />
                 </div>
@@ -236,6 +239,7 @@ export default function DashAddProduct() {
                       onChange={handleChange}
                       value={formData.regu_price}
                       id="regu_price"
+                      required
                       placeholder="$"
                     />
                   </div>
@@ -245,6 +249,7 @@ export default function DashAddProduct() {
                       onChange={handleChange}
                       value={formData.prom_price}
                       id="prom_price"
+                      required
                       placeholder="$"
                     />
                   </div>
@@ -270,6 +275,7 @@ export default function DashAddProduct() {
                     id="tax"
                     value={formData.tax}
                     onChange={handleChange}
+                    required
                     placeholder="$"
                   />
                 </div>
@@ -295,6 +301,7 @@ export default function DashAddProduct() {
                       id="width"
                       value={formData.width}
                       onChange={handleChange}
+                      required
                       placeholder="Inch"
                     />
                   </div>
@@ -304,6 +311,7 @@ export default function DashAddProduct() {
                       onChange={handleChange}
                       value={formData.height}
                       id="height"
+                      required
                       placeholder="Inch"
                     />
                   </div>
@@ -314,6 +322,7 @@ export default function DashAddProduct() {
                     onChange={handleChange}
                     value={formData.weight}
                     id="weight"
+                    required
                     placeholder="gam"
                   />
                 </div>
@@ -323,6 +332,7 @@ export default function DashAddProduct() {
                     id="shipping_fee"
                     onChange={handleChange}
                     value={formData.shipping_fee}
+                    required
                     placeholder="$"
                   />
                 </div>
