@@ -6,8 +6,20 @@ import Slider from "@mui/material/Slider";
 import { Carousel, Checkbox } from "flowbite-react";
 import slider1 from "../assets/images/slider_img/slider1.png";
 import slider2 from "../assets/images/slider_img/slider2.png";
-import blue_diamon from "../assets/images/product_img/blue_diamond.png";
-import { HiOutlineShoppingCart, HiShoppingCart, HiStar } from "react-icons/hi";
+import banner1 from "../assets/images/deals_banner/banner1.png";
+import banner2 from "../assets/images/deals_banner/banner2.png";
+import banner3 from "../assets/images/deals_banner/banner3.png";
+import banner4 from "../assets/images/deals_banner/banner4.png";
+import banner5 from "../assets/images/deals_banner/banner5.png";
+import banner6 from "../assets/images/deals_banner/banner6.png";
+import banner7 from "../assets/images/deals_banner/banner7.png";
+import {
+  HiArrowRight,
+  HiOutlineShoppingCart,
+  HiShoppingCart,
+  HiStar,
+} from "react-icons/hi";
+import CardDeal from "../components/CardDeal";
 
 interface Category {
   _id: string;
@@ -68,9 +80,9 @@ export default function Home() {
   }, [currentUser._id, query]);
 
   return (
-    <div className="lg:max-w-screen-2xl mx-auto md:w-full px-4">
+    <div className="lg:max-w-screen-2xl  mx-auto md:w-full px-4">
       <div className="w-full flex gap-4 mt-4">
-        <div className="w-1/5 space-y-6 ">
+        <div className="w-1/5 space-y-6 md:hidden lg:inline sm:hidden ">
           {/* CATEGORY */}
           <div className="rounded-md shadow-md p-4 bg-white">
             <h1 className="py-2 border-b border-[#3BB67F] text-xl font-semibold">
@@ -146,7 +158,8 @@ export default function Home() {
           </div>
           {/* NEW PRODUCTS */}
         </div>
-        <div className="w-4/5">
+
+        <div className="w-4/5 md:w-full">
           <div className="w-full h-56 sm:h-64 xl:h-80 2xl:h-96">
             <Carousel>
               <div className="flex h-full items-center justify-center">
@@ -174,10 +187,10 @@ export default function Home() {
             {products.map((product) => (
               <div
                 key={product._id}
-                className="w-[220px] border p-2 bg-white rounded-lg shadow-md"
+                className="w-[200px] min-h-[200px] border p-2 flex flex-col justify-between bg-white rounded-lg shadow-md"
               >
                 <div className="w-full flex items-center justify-center">
-                  <img src={product.image} alt="" className="" />
+                  <img src={product.image} alt="" className="h-[150px]" />
                 </div>
                 <div className="flex flex-col ">
                   <h1 className="text-base font-semibold ">{product.name}</h1>
@@ -206,6 +219,69 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* PRODUCTS */}
+
+          {/* DEALS OF THE DAY */}
+          <div className=" mt-8">
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-semibold">Deals Of The Day</h1>
+              <button className="flex items-center gap-2 *:hover:text-[#3BB67F] duration-200 *:text-sm *:text-neutral-400">
+                <span>All Deals</span>
+                <HiArrowRight />
+              </button>
+            </div>
+            <div className="flex gap-4 flex-wrap lg:justify-between md: justify-center ">
+              <CardDeal image={banner1} time={10000000000} />
+              <CardDeal image={banner2} time={12600000000} />
+              <CardDeal image={banner3} time={340000000} />
+              <CardDeal image={banner4} time={1000000000} />
+            </div>
+          </div>
+
+          {/*  */}
+
+          <div className="mt-6 lg:flex gap-4 md:flex md:justify-center">
+            <div className="">
+              <img src={banner5} alt="" />
+            </div>
+            <div className="">
+              <img src={banner6} alt="" />
+            </div>
+            <div className="">
+              <img src={banner7} alt="" />
+            </div>
+          </div>
+
+          {/* SHOP BY CATEGORIES */}
+          <div className=" mt-8">
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-semibold">Deals Of The Day</h1>
+              <button className="flex items-center gap-2 *:hover:text-[#3BB67F] duration-200 *:text-sm *:text-neutral-400">
+                <span>All Categories</span>
+                <HiArrowRight />
+              </button>
+            </div>
+            <div className="flex overflow-scroll scroll gap-4  mt-4">
+              {categories.map((category) => (
+                <div
+                  key={category._id}
+                  className="flex w-[130px] p-4 h-[150px] flex-col justify-center items-center rounded-md bg-neutral-300 shadow-md"
+                >
+                  <div className=" h-2/3 flex justify-center items-center">
+                    <img
+                      src={category.image}
+                      alt="image"
+                      className="w-[60px] "
+                    />
+                  </div>
+                  <span className="text-sm text-center font-semibold text-neutral-600  h-1/3">
+                    {category.name}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
