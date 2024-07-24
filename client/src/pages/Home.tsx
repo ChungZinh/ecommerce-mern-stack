@@ -22,6 +22,7 @@ import {
 import CardDeal from "../components/CardDeal";
 import CardProduct from "../components/CardProduct";
 import { buildQueryString } from "../utils/buildQueryString";
+import CardHotProduct from "../components/CardHotProduct";
 
 interface Category {
   _id: string;
@@ -251,7 +252,7 @@ export default function Home() {
                 <HiArrowRight />
               </button>
             </div>
-            <div className="flex gap-4 flex-wrap lg:justify-between md: justify-center ">
+            <div className="flex gap-4 mt-4 flex-wrap lg:justify-between md: justify-center ">
               <CardDeal image={banner1} time={10000000000} />
               <CardDeal image={banner2} time={12600000000} />
               <CardDeal image={banner3} time={340000000} />
@@ -300,6 +301,64 @@ export default function Home() {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/*  HOT */}
+          <div className=" mt-8">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+              <div className="flex flex-col bg-white p-2 shadow-md rounded-md">
+                <h1 className="text-base font-semibold border-b py-2 border-[#3BB67F]">
+                  Top Selling
+                </h1>
+                <div className="flex flex-col gap-2 mt-2">
+                  {
+                    // get 3 products from the top selling
+                    products.slice(0, 3).map((product) => (
+                      <CardHotProduct product={product} />
+                    ))
+                  }
+                </div>
+              </div>
+              <div className="flex flex-col bg-white p-2 shadow-md rounded-md">
+                <h1 className="text-base font-semibold border-b py-2 border-[#3BB67F]">
+                  Trending Products
+                </h1>
+                <div className="flex flex-col gap-2 mt-2">
+                  {
+                    // get 3 products from the top selling
+                    products.slice(4, 7).map((product) => (
+                      <CardHotProduct product={product} />
+                    ))
+                  }
+                </div>
+              </div>
+              <div className="flex flex-col bg-white p-2 shadow-md rounded-md">
+                <h1 className="text-base font-semibold border-b py-2 border-[#3BB67F]">
+                  Recently added
+                </h1>
+                <div className="flex flex-col gap-2 mt-2">
+                  {
+                    // get 3 products from the top selling
+                    products.slice(5, 8).map((product) => (
+                      <CardHotProduct product={product} />
+                    ))
+                  }
+                </div>
+              </div>
+              <div className="flex flex-col bg-white p-2 shadow-md rounded-md">
+                <h1 className="text-base font-semibold border-b py-2 border-[#3BB67F]">
+                  Top Rated
+                </h1>
+                <div className="flex flex-col gap-2 mt-2">
+                  {
+                    // get 3 products from the top selling
+                    products.slice(2, 5).map((product) => (
+                      <CardHotProduct product={product} />
+                    ))
+                  }
+                </div>
+              </div>
             </div>
           </div>
         </div>
