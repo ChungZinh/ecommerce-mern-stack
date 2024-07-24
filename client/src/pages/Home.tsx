@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { api } from "../api/api";
 import Slider from "@mui/material/Slider";
-import { Carousel, Checkbox } from "flowbite-react";
+import { Button, Carousel, Checkbox } from "flowbite-react";
 import slider1 from "../assets/images/slider_img/slider1.png";
 import slider2 from "../assets/images/slider_img/slider2.png";
 import banner1 from "../assets/images/deals_banner/banner1.png";
@@ -21,6 +21,7 @@ import {
 } from "react-icons/hi";
 import CardDeal from "../components/CardDeal";
 import CardProduct from "../components/CardProduct";
+import { buildQueryString } from "../utils/buildQueryString";
 
 interface Category {
   _id: string;
@@ -54,6 +55,8 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [value, setValue] = useState<number[]>([500, 1000]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
@@ -71,14 +74,26 @@ export default function Home() {
     };
 
     const fetchProducts = async () => {
-      const res = await api.getProductsList(currentUser._id, query);
+      const queryB = buildQueryString(query);
+      const res = await api.getProductsList(currentUser._id, queryB);
       if (res.data.products) {
         setProducts(res.data.products);
+        setTotalPages(res.data.totalPages);
       }
     };
     fetchProducts();
     fetchCategories();
   }, [currentUser?._id, query]);
+
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setPage(pageNumber);
+      setQuery((prevQuery) => ({
+        ...prevQuery,
+        page: pageNumber,
+      }));
+    }
+  };
 
   return (
     <div className="lg:max-w-screen-2xl  mx-auto md:w-full px-4">
@@ -184,10 +199,45 @@ export default function Home() {
             </ul>
           </div>
           {/* PRODUCTS */}
-          <div className="w-full mt-4 grid lg:grid-cols-5 md: grid-cols-4 gap-4">
-            {products.map((product) => (
-              <CardProduct product={product} />
-            ))}
+          <div className="">
+            <div className="w-full mt-4 grid lg:grid-cols-5 md: grid-cols-4 gap-4">
+              {products.map((product) => (
+                <CardProduct product={product} />
+              ))}
+            </div>
+            <div className="mt-4">
+              <div className="flex items-center gap-2">
+                <Button
+                  size={"xs"}
+                  color={"green"}
+                  disabled={page === 1}
+                  onClick={() => handlePageChange(page - 1)}
+                >
+                  Previous
+                </Button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <Button
+                    key={index + 1}
+                    size={"xs"}
+                    color={"green"}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={
+                      page === index + 1 ? "bg-green-600 text-white" : ""
+                    }
+                  >
+                    {index + 1}
+                  </Button>
+                ))}
+                <Button
+                  size={"xs"}
+                  color={"green"}
+                  disabled={page === totalPages}
+                  onClick={() => handlePageChange(page + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* PRODUCTS */}
