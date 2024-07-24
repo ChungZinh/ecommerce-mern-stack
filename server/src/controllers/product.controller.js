@@ -36,19 +36,7 @@ class ProductController {
     }).send(res);
   }
 
-  static async getTopSelling(req, res, next) {
-    new CreatedResponse({
-      message: "Top selling products",
-      data: await ProductService.addTopSellingProduct(),
-    }).send(res);
-  }
 
-  static async addTopSelling(req, res, next) {
-    new CreatedResponse({
-      message: "Product added to top selling",
-      data: await ProductService.addTopSellingProduct(req.body),
-    }).send(res);
-  }
 }
 
 module.exports = ProductController;

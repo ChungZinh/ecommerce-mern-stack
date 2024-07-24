@@ -116,12 +116,20 @@ class ProductService {
 
   static async addTopSellingProduct(req) {
     const { productId, sales } = req.body;
+    console.log("productId", productId);
+    console.log("sales", sales);
     const product = await Product.findById(productId);
+
+    // Kiểm tra tính hợp lệ của dữ liệu đầu vào
+    if (!productId || typeof sales !== "number" || isNaN(sales)) {
+      throw new NotFoundResponse("Invalid input data");
+    }
+
     if (!product) {
       throw new NotFoundResponse("Product not found");
     }
 
-    client.zAdd(topSellingKey, sales, productId);
+    await client.zAdd(topSellingKey, sales, productId);
 
     return product;
   }
@@ -135,8 +143,6 @@ class ProductService {
       productDetail.push({ ...product, sales: topSellingProducts[i + 1] });
     }
   }
-
-
 }
 
 module.exports = ProductService;
