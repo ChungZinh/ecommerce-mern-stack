@@ -200,10 +200,10 @@ export default function Home() {
             </ul>
           </div>
           {/* PRODUCTS */}
-          <div className="">
+          <div className=""> 
             <div className="w-full mt-4 grid lg:grid-cols-5 md: grid-cols-4 gap-4">
               {products.map((product) => (
-                <CardProduct product={product} />
+                <CardProduct key={product._id} product={product} />
               ))}
             </div>
             <div className="mt-4">
@@ -315,7 +315,7 @@ export default function Home() {
                   {
                     // get 3 products from the top selling
                     products.slice(0, 3).map((product) => (
-                      <CardHotProduct product={product} />
+                      <CardHotProduct key={product._id} product={product} />
                     ))
                   }
                 </div>
@@ -328,7 +328,7 @@ export default function Home() {
                   {
                     // get 3 products from the top selling
                     products.slice(4, 7).map((product) => (
-                      <CardHotProduct product={product} />
+                      <CardHotProduct key={product._id} product={product} />
                     ))
                   }
                 </div>
@@ -341,7 +341,7 @@ export default function Home() {
                   {
                     // get 3 products from the top selling
                     products.slice(5, 8).map((product) => (
-                      <CardHotProduct product={product} />
+                      <CardHotProduct key={product._id} product={product} />
                     ))
                   }
                 </div>
@@ -354,7 +354,7 @@ export default function Home() {
                   {
                     // get 3 products from the top selling
                     products.slice(2, 5).map((product) => (
-                      <CardHotProduct product={product} />
+                      <CardHotProduct key={product._id} product={product} />
                     ))
                   }
                 </div>

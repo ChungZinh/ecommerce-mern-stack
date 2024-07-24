@@ -20,7 +20,7 @@ interface Product {
 }
 export default function CardHotProduct({ product }: { product: Product }) {
   return (
-    <div className="flex items-center gap-4 bg-white shadow-md rounded-md p-2">
+    <div className="flex items-center gap-4 bg-white cursor-pointer ">
       <img src={product.image} alt="" className="w-[90px]" />
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-base">{product.name}</p>

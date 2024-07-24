@@ -7,6 +7,7 @@ import Error from "./pages/Error";
 import Header from "./components/Header";
 import AdminRoute from "./components/AdminRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import Footer from "./components/Footer";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         </Route>
         <Route path="*" element={<Error />} />
       </Routes>
+      <Footer/>
     </BrowserRouter>
   );
 }
