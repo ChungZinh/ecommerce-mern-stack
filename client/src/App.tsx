@@ -8,23 +8,24 @@ import Header from "./components/Header";
 import AdminRoute from "./components/AdminRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import Footer from "./components/Footer";
+import About from "./pages/About";
 
 function App() {
-
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <Header  />
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/about" element={<About />} />
         <Route element={<AdminRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="*" element={<Error />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </BrowserRouter>
   );
 }
