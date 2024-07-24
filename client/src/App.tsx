@@ -9,6 +9,7 @@ import AdminRoute from "./components/AdminRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import Footer from "./components/Footer";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route element={<AdminRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
