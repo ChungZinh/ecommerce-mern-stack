@@ -52,7 +52,7 @@ export default function ProductDetail() {
   return (
     <div className="mx-auto w-full px-4">
       <div className="w-full bg-white">
-        <div className="lg:max-w-screen-2xl mx-auto py-2 border-b">
+        <div className="lg:max-w-screen-2xl mx-auto py-4 border-b">
           <Breadcrumb aria-label="Default breadcrumb example">
             <Breadcrumb.Item href="/" icon={HiHome}>
               Home
