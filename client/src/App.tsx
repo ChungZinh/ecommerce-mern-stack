@@ -10,6 +10,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Footer from "./components/Footer";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route element={<AdminRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
