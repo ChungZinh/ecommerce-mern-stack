@@ -68,7 +68,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await api.getListCategory(currentUser._id, query);
+      const res = await api.getListCategory(query);
       if (res.data.categories) {
         setCategories(res.data.categories);
       }
@@ -76,7 +76,7 @@ export default function Home() {
 
     const fetchProducts = async () => {
       const queryB = buildQueryString(query);
-      const res = await api.getProductsList(currentUser._id, queryB);
+      const res = await api.getProductsList(queryB);
       if (res.data.products) {
         setProducts(res.data.products);
         setTotalPages(res.data.totalPages);
@@ -200,7 +200,7 @@ export default function Home() {
             </ul>
           </div>
           {/* PRODUCTS */}
-          <div className=""> 
+          <div className="">
             <div className="w-full mt-4 grid lg:grid-cols-5 md: grid-cols-4 gap-4">
               {products.map((product) => (
                 <CardProduct key={product._id} product={product} />
