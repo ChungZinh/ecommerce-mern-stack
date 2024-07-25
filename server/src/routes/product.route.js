@@ -9,14 +9,14 @@ router.get(
 );
 
 router.use(require("../auth/authUtils").verifyToken);
-router.post("/create", asyncHandler(ProductController.createProduct));
+router.post("/", asyncHandler(ProductController.createProduct));
 router.put("/move-to-draft/:id", asyncHandler(ProductController.moveToDraft));
 router.put(
   "/publish-product/:id",
   asyncHandler(ProductController.publishProduct)
 );
 router.put(
-  "/update-product/:id",
+  "/:id",
   asyncHandler(ProductController.updateProduct)
 );
 module.exports = router;
