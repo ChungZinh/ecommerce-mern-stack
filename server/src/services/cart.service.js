@@ -7,9 +7,9 @@ const {
   createUserCart,
   createCart,
 } = require("../models/repository/cart.repository");
-const { findProductById } = require("../models/repository/product.repository");
+const { findProductById, updateProductStock } = require("../models/repository/product.repository");
 const { findUserById } = require("../models/repository/user.repository");
-
+const Product = require("../models/product.model");
 class CartService {
   static async addToCart(req) {
     const userId = req.user._id;
@@ -56,33 +56,39 @@ class CartService {
         "You are not allowed to access this resource"
       );
     const userId = req.user._id || req.params.userId;
-
     const { productId } = req.params;
-    console.log("productId", productId);
-    // Kiểm tra giỏ hàng của người dùng
-    const cart = await findUserCart(userId);
+
+    // Check the user's cart
+    let cart = await findUserCart(userId);
     if (!cart) throw new NotFoundResponse("Cart not found");
 
-    // Kiểm tra sản phẩm trong giỏ hàng
-    const existingProduct = cart.products.find(
-      (p) => p.productId.toString() === productId
+    // Find the product in the cart
+    const existingProductIndex = cart.products.findIndex(
+      (p) => p.productId._id.toString() === productId.toString()
     );
-    if (!existingProduct)
-      throw new NotFoundResponse("Product not found in cart");
+    if (existingProductIndex === -1) throw new NotFoundResponse("Product not found in cart");
 
-    // Xóa sản phẩm khỏi giỏ hàng
-    cart.products = cart.products.filter(
-      (p) => p.productId.toString() !== productId
-    );
+    // Get the quantity to be removed
+    const quantityToRemove = cart.products[existingProductIndex].quantity;
 
-    console.log("cart.products", cart.products);
+    // Remove the product from the cart
+    cart.products.splice(existingProductIndex, 1);
 
-    // Cập nhật giỏ hàng
-    const updatedCart = await createCart(cart);
+    // Update the product stock
+    await updateProductStock(productId, -quantityToRemove);
 
-    return updatedCart;
+    // Recalculate total price
+    const productDetailsPromises = cart.products.map(async (p) => {
+      const prod = await Product.findById(p.productId).lean();
+      return p.quantity * (prod ? prod.prom_price : 0);
+    });
+
+    const productPrices = await Promise.all(productDetailsPromises);
+    cart.total = productPrices.reduce((acc, price) => acc + price, 0);
+
+    // Update and return the cart
+    return await createCart(cart);
   }
-
   // Cập nhật số lượng sản phẩm trong giỏ hàng
   static async updateProductQuantity(req) {
     if (req.user._id !== req.params.userId)
@@ -92,24 +98,36 @@ class CartService {
     const userId = req.user._id || req.params.userId;
     const { productId, quantity } = req.body;
 
-    // Kiểm tra giỏ hàng của người dùng
-    const cart = await findUserCart(userId);
+    // Check the user's cart
+    let cart = await findUserCart(userId);
     if (!cart) throw new NotFoundResponse("Cart not found");
 
-    // Kiểm tra sản phẩm trong giỏ hàng
+    // Find the product in the cart
     const existingProduct = cart.products.find(
-      (p) => p.productId.toString() === productId
+      (p) => p.productId._id.toString() === productId.toString()
     );
-    if (!existingProduct)
-      throw new NotFoundResponse("Product not found in cart");
+    if (!existingProduct) throw new NotFoundResponse("Product not found in cart");
 
-    // Cập nhật số lượng sản phẩm
+    // Calculate the quantity change
+    const quantityChange = quantity - existingProduct.quantity;
+
+    // Update the product quantity in the cart
     existingProduct.quantity = quantity;
 
-    // Cập nhật giỏ hàng
-    const updatedCart = await createCart(cart);
+    // Update the product stock
+    await updateProductStock(productId, quantityChange);
 
-    return updatedCart;
+    // Recalculate total price
+    const productDetailsPromises = cart.products.map(async (p) => {
+      const prod = await Product.findById(p.productId).lean();
+      return p.quantity * (prod ? prod.prom_price : 0);
+    });
+
+    const productPrices = await Promise.all(productDetailsPromises);
+    cart.total = productPrices.reduce((acc, price) => acc + price, 0);
+
+    // Update and return the cart
+    return await createCart(cart);
   }
 }
 

@@ -222,4 +222,16 @@ export const api = {
         "x-client-id": userId,
       },
     }),
+
+  addProductToCart: (
+    formData: { productId: string; quantity: number },
+    userId: string
+  ): Promise<ApiResponse<Product>> =>
+    request<ApiResponse<Product>>(`/cart`, {
+      method: "POST",
+      headers: {
+        "x-client-id": userId,
+      },
+      body: JSON.stringify(formData),
+    }),
 };
