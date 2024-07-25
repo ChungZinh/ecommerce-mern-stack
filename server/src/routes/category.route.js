@@ -3,7 +3,7 @@ const router = express.Router();
 const { asyncHandler } = require("../helpers/asyncHandler");
 const CategoryController = require("../controllers/category.controller");
 
-router.get("/get-list", asyncHandler(CategoryController.getList));
+router.get("/", asyncHandler(CategoryController.getList));
 
 router.use(require("../auth/authUtils").verifyToken);
 router.post("/create", asyncHandler(CategoryController.create));

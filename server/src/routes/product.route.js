@@ -4,7 +4,7 @@ const { asyncHandler } = require("../helpers/asyncHandler");
 const ProductController = require("../controllers/product.controller");
 const { setPromise } = require("../services/redis.service");
 router.get(
-  "/get-products-list",
+  "/",
   asyncHandler(ProductController.getProductsList)
 );
 
