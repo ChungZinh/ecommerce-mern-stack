@@ -63,7 +63,7 @@ export default function DashProductList() {
       setLoading(true);
       try {
         const queryB = buildQueryString(query);
-        const res = await api.getProductsList(currentUser._id, queryB);
+        const res = await api.getProductsList(queryB);
         if (res.data.products) {
           setProducts(res.data.products);
           setLoading(false);
@@ -77,7 +77,7 @@ export default function DashProductList() {
 
     const fetchCategories = async () => {
       try {
-        const res = await api.getListCategory(currentUser._id, cQuery);
+        const res = await api.getListCategory(cQuery);
         if (res.data) {
           setCategories(res.data.categories);
         }

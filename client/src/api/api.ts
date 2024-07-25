@@ -125,7 +125,7 @@ export const api = {
       },
     }),
   updateUser: (formData: FormData, userId: string): Promise<UpdateUser> =>
-    request<UpdateUser>(`/user/update/${userId}`, {
+    request<UpdateUser>(`/user/${userId}`, {
       method: "PUT",
       body: JSON.stringify(formData),
       headers: {
@@ -136,7 +136,7 @@ export const api = {
     formData: Category,
     userId: string
   ): Promise<ApiResponse<Category>> =>
-    request<ApiResponse<Category>>(`/category/create`, {
+    request<ApiResponse<Category>>(`/category`, {
       method: "POST",
       body: JSON.stringify(formData),
       headers: {
@@ -144,18 +144,15 @@ export const api = {
       },
     }),
 
-  getListCategory: (
-    query: string
-  ): Promise<ApiResponse<Category[]>> =>
+  getListCategory: (query: string): Promise<ApiResponse<Category[]>> =>
     request<ApiResponse<Category[]>>(`/category${query}`, {
       method: "GET",
- 
     }),
   createProduct: (
     formData: Product,
     userId: string
   ): Promise<ApiResponse<Product>> =>
-    request<ApiResponse<Product>>(`/product/create`, {
+    request<ApiResponse<Product>>(`/product`, {
       method: "POST",
       body: JSON.stringify(formData),
       headers: {
@@ -167,7 +164,7 @@ export const api = {
     formData: Product,
     userId: string
   ): Promise<ApiResponse<Product>> =>
-    request<ApiResponse<Product>>(`/product/update-product/${formData._id}`, {
+    request<ApiResponse<Product>>(`/product/${formData._id}`, {
       method: "PUT",
       body: JSON.stringify(formData),
       headers: {
@@ -175,12 +172,9 @@ export const api = {
       },
     }),
 
-  getProductsList: (
-    query: string
-  ): Promise<ApiResponse<Product[]>> =>
+  getProductsList: (query: string): Promise<ApiResponse<Product[]>> =>
     request<ApiResponse<Product[]>>(`/product${query}`, {
       method: "GET",
-
     }),
 
   moveToDraft: (
@@ -210,7 +204,7 @@ export const api = {
     categoryId: string,
     formData: Category
   ): Promise<ApiResponse<Category>> =>
-    request<ApiResponse<Category>>(`/category/update/${categoryId}`, {
+    request<ApiResponse<Category>>(`/category/${categoryId}`, {
       method: "PUT",
       body: JSON.stringify(formData),
       headers: {
@@ -222,7 +216,7 @@ export const api = {
     userId: string,
     categoryId: string
   ): Promise<ApiResponse<Category>> =>
-    request<ApiResponse<Category>>(`/category/delete/${categoryId}`, {
+    request<ApiResponse<Category>>(`/category/${categoryId}`, {
       method: "DELETE",
       headers: {
         "x-client-id": userId,

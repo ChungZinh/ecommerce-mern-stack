@@ -51,7 +51,7 @@ export default function DashCategories() {
     const fetchCategories = async () => {
       try {
         const sQuery = buildQueryString(query);
-        const res = await api.getListCategory(currentUser._id, sQuery);
+        const res = await api.getListCategory(sQuery);
         if (res.data) {
           setCategories(res.data.categories);
           setTotalPages(res.data.totalPages);
@@ -87,7 +87,6 @@ export default function DashCategories() {
       console.error("Error creating category", error);
     }
   };
-
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {

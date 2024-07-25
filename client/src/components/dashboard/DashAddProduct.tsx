@@ -63,7 +63,7 @@ export default function DashAddProduct() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.getListCategory(currentUser._id, query);
+        const res = await api.getListCategory(query);
         if (res.data) {
           setCategories(res.data.categories);
           // set all text fields to empty
