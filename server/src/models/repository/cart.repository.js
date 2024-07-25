@@ -49,12 +49,14 @@ const createUserCart = async ({ userId, product = {} }) => {
     return await newCart.save();
   }
 };
+// Tìm giỏ hàng theo ID
 const findCartById = async (id) => {
   return await Cart.findById(id).lean();
 };
 
+// Tạo mới giỏ hàng
 const createCart = async (cart) => {
-  return await Cart.create(cart);
+  return await Cart.findByIdAndUpdate(cart._id, cart, { new: true }).lean();
 };
 
 module.exports = {
