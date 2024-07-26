@@ -1,5 +1,13 @@
 import { HiOutlineShoppingCart, HiStar } from "react-icons/hi";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../redux/store";
+import {
+  addItemToCartFailure,
+  addItemToCartStart,
+  addItemToCartSuccess,
+} from "../redux/cart/cartSlice";
+import { api } from "../api/api";
 
 interface Product {
   name: string;
@@ -23,18 +31,40 @@ interface CardProductProps {
   product: Product;
 }
 export default function CardProduct({ product }: CardProductProps) {
+  const { loading } = useSelector((state: RootState) => state.cart);
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/product/${product._id}`, { state: { product } });
   };
+
+  const handleAddToCart = async (product) => {
+    dispatch(addItemToCartStart());
+    try {
+      const res = await api.addProductToCart(
+        { productId: product._id, quantity: 1 },
+        currentUser._id
+      );
+
+      if (res.data.products) {
+        dispatch(addItemToCartSuccess(product));
+      }
+    } catch (error) {
+      dispatch(addItemToCartFailure(error.message));
+    }
+  };
+
   return (
     <div
-      onClick={handleClick}
       key={product._id}
       className="md:w-[200px] cursor-pointer lg:w-[225px] lg:h-[300px] border p-2 flex flex-col justify-between bg-white rounded-lg shadow-md"
     >
-      <div className="w-full flex items-center justify-center">
+      <div
+        onClick={handleClick}
+        className="w-full flex items-center justify-center"
+      >
         <img src={product.image} alt="" className="h-[150px]" />
       </div>
       <div className="flex flex-col ">
@@ -56,7 +86,11 @@ export default function CardProduct({ product }: CardProductProps) {
               $ {product.regu_price}
             </p>
           </div>
-          <button className="flex  items-center bg-[#3BB67F] duration-200 p-1 rounded-md hover:bg-[#3BE67F] gap-1 ">
+          <button
+            disabled={loading}
+            onClick={() => handleAddToCart(product)}
+            className="flex  items-center bg-[#3BB67F] duration-200 p-1 rounded-md hover:bg-[#3BE67F] gap-1 "
+          >
             <HiOutlineShoppingCart className="text-white text-sm " />
             <span className="text-white text-sm">Add</span>
           </button>

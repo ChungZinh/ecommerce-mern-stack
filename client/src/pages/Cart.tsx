@@ -1,11 +1,56 @@
-import { Breadcrumb, Table } from "flowbite-react";
-import React from "react";
-import { HiHome } from "react-icons/hi";
-import { useSelector } from "react-redux";
+import {
+  Breadcrumb,
+  Button,
+  Checkbox,
+  Select,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
+import React, { useEffect, useState } from "react";
+import {
+  HiArrowLeft,
+  HiClipboard,
+  HiHome,
+  HiOutlineClipboard,
+} from "react-icons/hi";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-
+import { api } from "../api/api";
+import {
+  setCartFailure,
+  setCartStart,
+  setCartSuccess,
+} from "../redux/cart/cartSlice";
+import { PiArrowsCounterClockwise } from "react-icons/pi";
+import {
+  CitySelect,
+  CountrySelect,
+  StateSelect,
+} from "react-country-state-city";
+import "react-country-state-city/dist/react-country-state-city.css";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 export default function Cart() {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const cart = useSelector((state: RootState) => state.cart.cartItems);
+  const { loading } = useSelector((state: RootState) => state.cart);
+  const [countryid, setCountryid] = useState(0);
+  const [stateid, setstateid] = useState(0);
+  useEffect(() => {
+    dispatch(setCartStart());
+    const fetchCart = async () => {
+      try {
+        const res = await api.getCart(currentUser._id);
+        if (res.data.products) {
+          dispatch(setCartSuccess(res.data.products));
+        }
+      } catch (error) {
+        dispatch(setCartFailure(error.message));
+      }
+    };
+    fetchCart();
+  }, [currentUser._id]);
   console.log("cart", cart);
   return (
     <div className="mx-auto w-full px-4">
@@ -28,7 +73,7 @@ export default function Cart() {
             : `is ${cart.length} product`}{" "}
           in your cart{" "}
         </p>
-        <div className="w-full">
+        <div className="w-full lg:flex gap-6">
           <div className="lg:w-3/4">
             {cart.length === 0 ? (
               <div className="bg-white p-4 mt-4">
@@ -36,40 +81,181 @@ export default function Cart() {
                 <p className="mt-2">You have no items in your cart</p>
               </div>
             ) : (
-              <div className="">
-                <Table>
-                  <Table.Head>
-                    <Table.Row>
-                      <Table.Cell>Product</Table.Cell>
-                      <Table.Cell>Price</Table.Cell>
-                      <Table.Cell>Quantity</Table.Cell>
-                      <Table.Cell>Subtotal</Table.Cell>
-                    </Table.Row>
+              <div className="mt-8 border p-4 rounded-md">
+                {loading && <Spinner />}
+                <Table hoverable>
+                  <Table.Head className="text-[#3BB578] bg-gray-100">
+                    <Table.HeadCell>
+                      <Checkbox></Checkbox>
+                    </Table.HeadCell>
+                    <Table.HeadCell>Product</Table.HeadCell>
+                    <Table.HeadCell>Unit Price</Table.HeadCell>
+                    <Table.HeadCell>Quantity</Table.HeadCell>
+                    <Table.HeadCell>Subtotal</Table.HeadCell>
+                    <Table.HeadCell>Remove</Table.HeadCell>
                   </Table.Head>
-                  <Table.Body>
+                  <Table.Body className="divide-y">
                     {cart.map((item) => (
-                      <Table.Row key={item.product}>
-                      <Table.Cell>
-                        <div className="flex items-center">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                          <p className="ml-4">{item.name}</p>
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell>${item.price}</Table.Cell>
-                      <Table.Cell>{item.quantity}</Table.Cell>
-                      <Table.Cell>${item.quantity * item.price}</Table.Cell>
-                    </Table.Row>
+                      <Table.Row key={item.productId._id}>
+                        <Table.Cell>
+                          <Checkbox />
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex items-center">
+                            <img
+                              src={item.productId.image}
+                              alt={item.productId.name}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                            <p className="ml-4">{item.productId.name}</p>
+                          </div>
+                        </Table.Cell>
+                        <Table.Cell>${item.productId.prom_price}</Table.Cell>
+                        <Table.Cell>
+                          <div className="w-[90px]   rounded-md border border-[#3BB67F] flex  items-center">
+                            <p className="w-[80px] text-center">{item.quantity}</p>
+                            <div className="flex flex-col items-center">
+                              <button
+                                // onClick={() => setQuantity(quantity - 1)}
+                                className=" rounded-md px-2 py-1 text-[#3BB67F]"
+                              >
+                                <IoIosArrowUp />
+                              </button>
+                              <button
+                                // onClick={() => setQuantity(quantity + 1)}
+                                className=" rounded-md px-2 py-1 text-[#3BB67F]"
+                              >
+                                <IoIosArrowDown />
+                              </button>
+                            </div>
+                          </div>
+                        </Table.Cell>
+                        <Table.Cell>
+                          $
+                          {(item.productId.prom_price * item.quantity).toFixed(
+                            2
+                          )}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Button
+                            size={"xs"}
+                            className="text-white bg-[#3BB578]"
+                          >
+                            Remove
+                          </Button>
+                        </Table.Cell>
+                      </Table.Row>
                     ))}
                   </Table.Body>
                 </Table>
               </div>
             )}
+            <div className="flex justify-between items-center  mt-4">
+              <Button
+                size={"md"}
+                className="text-white bg-[#3BB578] flex items-center   "
+              >
+                <HiArrowLeft className="text-xl mr-2" />
+                <span>Continue Shopping</span>
+              </Button>
+
+              <div className="">
+                <Button
+                  size={"md"}
+                  className="text-white bg-[#3BB578] flex items-center gap-2"
+                >
+                  <PiArrowsCounterClockwise className="text-xl mr-2" />
+                  Update Cart
+                </Button>
+              </div>
+            </div>
+
+            <div className="lg:flex justify-between">
+              <div className=" mt-4 border p-4 rounded-md">
+                <div className="">
+                  <div className="">
+                    <h1 className="text-xl font-semibold">
+                      Calculate Shipping
+                    </h1>
+                    <p className="*:text-xs text-xs text-neutral-400 ">
+                      Flat rate <span className="text-[#3BB578]">5%</span>
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <CountrySelect
+                      onChange={(e) => {
+                        setCountryid(e.id);
+                      }}
+                      placeHolder="Select Country"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 mt-4 gap-4">
+                    <StateSelect
+                      countryid={countryid}
+                      onChange={(e) => {
+                        setstateid(e.id);
+                      }}
+                      placeHolder="Select State"
+                    />
+                    <CitySelect
+                      countryid={countryid}
+                      stateid={stateid}
+                      onChange={(e) => {
+                        console.log(e);
+                      }}
+                      placeHolder="Select City"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="md:flex flex-col justify-center items-center mt-4 gap-4 border rounded-md p-4">
+                <h1 className="text-xl font-semibold">Calculate Shipping</h1>
+                <p className="text-xs text-neutral-400">Using A Promo Code?</p>
+                <div className="flex items-center gap-2">
+                  <TextInput placeholder="Enter promo code" />
+                  <Button size={"md"} className="text-white bg-[#3BB578]">
+                    <HiOutlineClipboard />
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="lg:w-1/4"></div>
+          <div className="lg:w-1/4 mt-4">
+            <div className="mt-4 border rounded-md p-4">
+              <h1 className="text-xl font-semibold md:text-center">
+                Cart Totals
+              </h1>
+              <div className="flex justify-between items-center mt-4 border p-2 ">
+                <p>Subtotal</p>
+                <p>
+                  $
+                  {cart
+                    .reduce((acc, item) => acc + item.productId.prom_price, 0)
+                    .toFixed(2)}
+                </p>
+              </div>
+              <div className="flex justify-between items-center mt-4 border p-2">
+                <p>Shipping</p>
+                <p>$0.00</p>
+              </div>
+              <div className="flex justify-between items-center mt-4 border p-2">
+                <p>Total</p>
+                <p>
+                  $
+                  {cart
+                    .reduce((acc, item) => acc + item.productId.prom_price, 0)
+                    .toFixed(2)}
+                </p>
+              </div>
+              <Button
+                size={"md"}
+                className="text-white bg-[#3BB578] md:w-full mt-4"
+              >
+                Proceed to Checkout
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -234,4 +234,12 @@ export const api = {
       },
       body: JSON.stringify(formData),
     }),
+
+  getCart: (userId: string): Promise<ApiResponse<Product[]>> =>
+    request<ApiResponse<Product[]>>(`/cart/${userId}`, {
+      method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
 };

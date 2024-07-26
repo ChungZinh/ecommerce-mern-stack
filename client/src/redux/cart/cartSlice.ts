@@ -22,6 +22,18 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    setCartStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    setCartSuccess: (state, action) => {
+      state.cartItems = action.payload;
+      state.loading = false;
+    },
+    setCartFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
     addItemToCartStart: (state) => {
       state.loading = true;
       state.error = null;
@@ -72,6 +84,12 @@ export const {
   removeItemFromCartStart,
   removeItemFromCartSuccess,
   removeItemFromCartFailure,
+  updateItemInCartStart,
+  updateItemInCartSuccess,
+  updateItemInCartFailure,
+  setCartStart,
+  setCartSuccess,
+  setCartFailure,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
