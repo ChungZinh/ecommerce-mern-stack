@@ -3,7 +3,7 @@ const router = express.Router();
 const { asyncHandler } = require("../helpers/asyncHandler");
 const CartController = require("../controllers/cart.controller");
 router.use(require("../auth/authUtils").verifyToken);
-router.post("/", asyncHandler(CartController.addToCart));
+router.post("/:userId", asyncHandler(CartController.addToCart));
 router.get("/:userId", asyncHandler(CartController.getUserCart));
 router.put("/:userId", asyncHandler(CartController.updateCart));
 router.delete(

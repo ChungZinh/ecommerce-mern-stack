@@ -15,13 +15,8 @@ import {
   HiOutlineClipboard,
 } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { api } from "../api/api";
-import {
-  setCartFailure,
-  setCartStart,
-  setCartSuccess,
-} from "../redux/cart/cartSlice";
 import { PiArrowsCounterClockwise } from "react-icons/pi";
 import {
   CitySelect,
@@ -30,27 +25,34 @@ import {
 } from "react-country-state-city";
 import "react-country-state-city/dist/react-country-state-city.css";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import {
+  fetchCart,
+  removeItemFromCart,
+  updateCart,
+} from "../redux/cart/cartSlice";
 export default function Cart() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const cart = useSelector((state: RootState) => state.cart.cartItems);
   const { loading } = useSelector((state: RootState) => state.cart);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [countryid, setCountryid] = useState(0);
   const [stateid, setstateid] = useState(0);
+  const cartSize = useSelector((state: RootState) => state.cart.cartSize);
+  const cart = useSelector((state: RootState) => state.cart.cartItems);
+  const total = useSelector((state: RootState) => state.cart.total);
+
   useEffect(() => {
-    dispatch(setCartStart());
-    const fetchCart = async () => {
-      try {
-        const res = await api.getCart(currentUser._id);
-        if (res.data.products) {
-          dispatch(setCartSuccess(res.data.products));
-        }
-      } catch (error) {
-        dispatch(setCartFailure(error.message));
-      }
-    };
-    fetchCart();
+    dispatch(fetchCart(currentUser._id));
   }, [currentUser._id]);
+
+  const handleRemove = async (productId: string) => {
+    dispatch(removeItemFromCart({ userId: currentUser._id, productId }));
+  };
+
+  const handleUpdateItem = (productId: string, quantity: number) => {
+    dispatch(updateCart({ userId: currentUser._id, productId, quantity }));
+  };
+
   console.log("cart", cart);
   return (
     <div className="mx-auto w-full px-4">
@@ -68,14 +70,12 @@ export default function Cart() {
         <h1 className="text-5xl font-semibold">Your Cart</h1>
         <p className="mt-2">
           There{" "}
-          {cart.length > 1
-            ? `are ${cart.length} products`
-            : `is ${cart.length} product`}{" "}
+          {cartSize > 1 ? `are ${cartSize} products` : `is ${cartSize} product`}{" "}
           in your cart{" "}
         </p>
         <div className="w-full lg:flex gap-6">
           <div className="lg:w-3/4">
-            {cart.length === 0 ? (
+            {cartSize === 0 ? (
               <div className="bg-white p-4 mt-4">
                 <h2 className="text-2xl font-semibold">Your cart is empty</h2>
                 <p className="mt-2">You have no items in your cart</p>
@@ -113,16 +113,28 @@ export default function Cart() {
                         <Table.Cell>${item.productId.prom_price}</Table.Cell>
                         <Table.Cell>
                           <div className="w-[90px]   rounded-md border border-[#3BB67F] flex  items-center">
-                            <p className="w-[80px] text-center">{item.quantity}</p>
+                            <p className="w-[80px] text-center">
+                              {item.quantity}
+                            </p>
                             <div className="flex flex-col items-center">
                               <button
-                                // onClick={() => setQuantity(quantity - 1)}
+                                onClick={() =>
+                                  handleUpdateItem(
+                                    item.productId._id,
+                                    item.quantity + 1
+                                  )
+                                }
                                 className=" rounded-md px-2 py-1 text-[#3BB67F]"
                               >
                                 <IoIosArrowUp />
                               </button>
                               <button
-                                // onClick={() => setQuantity(quantity + 1)}
+                                onClick={() =>
+                                  handleUpdateItem(
+                                    item.productId._id,
+                                    item.quantity - 1
+                                  )
+                                }
                                 className=" rounded-md px-2 py-1 text-[#3BB67F]"
                               >
                                 <IoIosArrowDown />
@@ -138,8 +150,10 @@ export default function Cart() {
                         </Table.Cell>
                         <Table.Cell>
                           <Button
+                            onClick={() => handleRemove(item.productId._id)}
                             size={"xs"}
                             className="text-white bg-[#3BB578]"
+                            disabled={loading}
                           >
                             Remove
                           </Button>
@@ -228,12 +242,7 @@ export default function Cart() {
               </h1>
               <div className="flex justify-between items-center mt-4 border p-2 ">
                 <p>Subtotal</p>
-                <p>
-                  $
-                  {cart
-                    .reduce((acc, item) => acc + item.productId.prom_price, 0)
-                    .toFixed(2)}
-                </p>
+                <p>${total.toFixed(2)}</p>
               </div>
               <div className="flex justify-between items-center mt-4 border p-2">
                 <p>Shipping</p>
@@ -241,12 +250,7 @@ export default function Cart() {
               </div>
               <div className="flex justify-between items-center mt-4 border p-2">
                 <p>Total</p>
-                <p>
-                  $
-                  {cart
-                    .reduce((acc, item) => acc + item.productId.prom_price, 0)
-                    .toFixed(2)}
-                </p>
+                <p>${total.toFixed(2)}</p>
               </div>
               <Button
                 size={"md"}

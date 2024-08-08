@@ -35,6 +35,8 @@ export default function Header() {
   const navigate = useNavigate();
   const theme = useSelector((state: RootState) => state.theme.value);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const cart = useSelector((state: RootState) => state.cart.cartItems);
+  const cartSize = useSelector((state: RootState) => state.cart.cartSize);
   const toggleTheme = () => {
     dispatch(setTheme(theme === "light" ? "dark" : "light"));
   };
@@ -176,14 +178,47 @@ export default function Header() {
                       <HiOutlineHeart className="text-2xl text-[#3BB67F]" />
                       <span className="text-sm">Wishlist</span>
                     </Link>
-                    <Link to={"/cart"} className="flex items-center">
-                      <HiOutlineShoppingCart className="text-2xl text-[#3BB67F]" />
-                      <span className="text-sm">Cart</span>
+                    <Link to={"/cart"} className="">
+                      <div className="relative flex justify-center items-center h-[40px] ">
+                        <div className="flex items-center  ">
+                          <HiOutlineShoppingCart className="text-2xl text-[#3BB67F]" />
+                          <span className="text-sm">Cart</span>
+                        </div>
+                        {cartSize > 0 && (
+                          <span className="text-xs bg-[#3BB67F] text-white absolute top-0 right-[-10px] rounded-full w-4 font-semibold text-center h-4">
+                            {cartSize}
+                          </span>
+                        )}
+                      </div>
                     </Link>
-                    <Link to={"/account"} className="flex items-center">
-                      <HiOutlineUser className="text-2xl text-[#3BB67F]" />
-                      <span className="text-sm">Account</span>
-                    </Link>
+                    <div className="">
+                      <Dropdown
+                        arrowIcon={false}
+                        inline
+                        label={
+                          <div className="flex items-center">
+                            <HiOutlineUser className="text-2xl text-[#3BB67F]" />
+                            <span className="text-sm">Account</span>
+                          </div>
+                        }
+                      >
+                        <Dropdown.Header>
+                          <div className="flex items-center">
+                            <HiOutlineUser className="text-2xl text-[#3BB67F]" />
+                            <span className="block text-sm">
+                              {currentUser.email}
+                            </span>
+                          </div>
+                        </Dropdown.Header>
+                        <Link to={"/dashboard?tab=setting"}>
+                          <Dropdown.Item>Profile</Dropdown.Item>
+                        </Link>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={handleLogout}>
+                          Sign out
+                        </Dropdown.Item>
+                      </Dropdown>
+                    </div>
                   </div>
                 </Navbar>
               </div>

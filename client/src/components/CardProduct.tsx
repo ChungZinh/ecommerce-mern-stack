@@ -1,15 +1,13 @@
 import { HiOutlineShoppingCart, HiStar } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "../redux/store";
-import {
-  addItemToCartFailure,
-  addItemToCartStart,
-  addItemToCartSuccess,
-} from "../redux/cart/cartSlice";
-import { api } from "../api/api";
+import { RootState, AppDispatch } from "../redux/store";
+
+import { addItemToCart } from "../redux/cart/cartSlice";
+import { AsyncThunkAction } from "@reduxjs/toolkit";
 
 interface Product {
+  _id: string;
   name: string;
   stock: number;
   description: string;
@@ -33,27 +31,22 @@ interface CardProductProps {
 export default function CardProduct({ product }: CardProductProps) {
   const { loading } = useSelector((state: RootState) => state.cart);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/product/${product._id}`, { state: { product } });
   };
 
-  const handleAddToCart = async (product) => {
-    dispatch(addItemToCartStart());
-    try {
-      const res = await api.addProductToCart(
-        { productId: product._id, quantity: 1 },
-        currentUser._id
-      );
-
-      if (res.data.products) {
-        dispatch(addItemToCartSuccess(product));
-      }
-    } catch (error) {
-      dispatch(addItemToCartFailure(error.message));
-    }
+  const handleAddToCart = async (product: Product) => {
+    console.log("productId:", product._id);
+    dispatch(
+      addItemToCart({
+        userId: currentUser._id,
+        productId: product._id,
+        quantity: 1,
+      })
+    );
   };
 
   return (
