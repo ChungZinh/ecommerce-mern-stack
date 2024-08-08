@@ -1,9 +1,11 @@
 const Product = require("../product.model");
-
-const findProductById = async (id) => {
-  return await Product.findById(id).lean();
+const mongoose = require("mongoose");
+const findProductById = async (productId) => {
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return null;
+  }
+  return await Product.findById(productId);
 };
-
 const updateProductStock1 = async (productId, newStock) => {
   return await Product.findByIdAndUpdate(
     productId,
@@ -21,12 +23,15 @@ const updateProductStock = async (productId, quantityChange) => {
   const newStock = product.stock - quantityChange;
 
   // Update the product stock
-  await Product.findByIdAndUpdate(productId, { stock: newStock }, { new: true });
+  await Product.findByIdAndUpdate(
+    productId,
+    { stock: newStock },
+    { new: true }
+  );
 };
-
 
 module.exports = {
   findProductById,
   updateProductStock,
-  updateProductStock1
+  updateProductStock1,
 };

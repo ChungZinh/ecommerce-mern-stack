@@ -1,134 +1,211 @@
-const {
-  NotFoundResponse,
-  ForbiddenResponse,
-} = require("../core/error.response");
-const {
-  findUserCart,
-  createUserCart,
-  createCart,
-} = require("../models/repository/cart.repository");
-const { findProductById, updateProductStock } = require("../models/repository/product.repository");
+const { NotFoundResponse } = require("../core/error.response");
 const { findUserById } = require("../models/repository/user.repository");
-const Product = require("../models/product.model");
+const Cart = require("../models/cart.model");
+const { findProductById } = require("../models/repository/product.repository");
 class CartService {
-  static async addToCart(req) {
-    const userId = req.user._id;
-    const { productId, quantity } = req.body;
+  static async getCart(req) {
+    const user = await findUserById(req.user._id || req.params.userId);
 
-    // Kiểm tra người dùng
-    const user = await findUserById(userId);
     if (!user) throw new NotFoundResponse("User not found");
 
-    // Kiểm tra sản phẩm
+    console.log("user", user);
+    const cart = await Cart.findOne({
+      userId: user._id,
+      status: "ACTIVE",
+    }).populate("items.productId");
+
+    console.log(cart);
+
+    return cart;
+  }
+
+  static async addItemToCart(req) {
+    // Check if the user exists
+    const user = await findUserById(req.user._id);
+    if (!user) throw new NotFoundResponse("User not found");
+
+    const { productId, quantity } = req.body;
+
+    // Check if the quantity is a positive number
+    if (isNaN(quantity) || quantity <= 0) {
+      throw new Error("Quantity must be a positive number");
+    }
+
+    // Check if the product exists
     const product = await findProductById(productId);
     if (!product) throw new NotFoundResponse("Product not found");
 
-    // Tạo hoặc cập nhật giỏ hàng của người dùng
-    const cart = await createUserCart({
-      userId,
-      product: { productId, quantity },
+    // Check if there's enough stock
+    if (product.stock < quantity) {
+      throw new Error("Not enough stock available");
+    }
+
+    let cart = await Cart.findOne({
+      userId: user._id,
+      status: "ACTIVE",
     });
+
+    if (!cart) {
+      cart = new Cart({
+        userId: user._id,
+        items: [
+          {
+            productId: product._id,
+            quantity,
+          },
+        ],
+        total: 0,
+        status: "ACTIVE",
+      });
+    } else {
+      const item = cart.items.find((item) =>
+        item.productId.equals(product._id)
+      );
+
+      if (item) {
+        item.quantity += quantity;
+      } else {
+        cart.items.push({
+          productId: product._id,
+          quantity,
+        });
+      }
+    }
+
+    // Update the product stock
+    product.stock -= quantity;
+    await product.save();
+
+    await cart.save();
 
     return cart;
   }
 
-  static async getUserCart(req) {
-    if (req.user._id !== req.params.userId)
-      throw new ForbiddenResponse(
-        "You are not allowed to access this resource"
-      );
-    const userId = req.user._id || req.params.userId;
-
-    // Kiểm tra người dùng
-    const user = await findUserById(userId);
+  static async updateCart(req) {
+    const user = await findUserById(req.user._id);
     if (!user) throw new NotFoundResponse("User not found");
 
-    // Lấy giỏ hàng của người dùng
-    const cart = await findUserCart(userId);
-    if (!cart) throw new NotFoundResponse("Cart not found");
+    const { productId, quantity } = req.body;
+
+    if (isNaN(quantity) || quantity < 0) {
+      throw new Error("Quantity must be a non-negative number");
+    }
+
+    const product = await findProductById(productId);
+    if (!product) throw new NotFoundResponse("Product not found");
+
+    let cart = await Cart.findOne({
+      userId: user._id,
+      status: "ACTIVE",
+    });
+
+    if (!cart) {
+      throw new NotFoundResponse("Cart not found");
+    }
+
+    const item = cart.items.find((item) => item.productId.equals(product._id));
+    if (!item) {
+      throw new NotFoundResponse("Item not found in cart");
+    }
+
+    const originalQuantity = item.quantity;
+
+    if (quantity === 0) {
+      // Remove the item if quantity is set to 0
+      cart.items = cart.items.filter(
+        (item) => !item.productId.equals(product._id)
+      );
+    } else {
+      // Update the quantity
+      item.quantity = quantity;
+    }
+
+    // Adjust the stock
+    const quantityDifference = originalQuantity - quantity;
+    product.stock += quantityDifference;
+    await product.save();
+
+    await cart.save();
 
     return cart;
   }
 
-  static async removeProductFromCart(req) {
-    if (req.user._id !== req.params.userId)
-      throw new ForbiddenResponse(
-        "You are not allowed to access this resource"
-      );
-    const userId = req.user._id || req.params.userId;
+  static async removeItemFromCart(req) {
+    const user = await findUserById(req.user._id);
+    if (!user) throw new NotFoundResponse("User not found");
+  
     const { productId } = req.params;
-
-    // Check the user's cart
-    let cart = await findUserCart(userId);
-    if (!cart) throw new NotFoundResponse("Cart not found");
-
-    // Find the product in the cart
-    const existingProductIndex = cart.products.findIndex(
-      (p) => p.productId._id.toString() === productId.toString()
-    );
-    if (existingProductIndex === -1) throw new NotFoundResponse("Product not found in cart");
-
-    // Get the quantity to be removed
-    const quantityToRemove = cart.products[existingProductIndex].quantity;
-
-    // Remove the product from the cart
-    cart.products.splice(existingProductIndex, 1);
-
-    // Update the product stock
-    await updateProductStock(productId, -quantityToRemove);
-
-    // Recalculate total price
-    const productDetailsPromises = cart.products.map(async (p) => {
-      const prod = await Product.findById(p.productId).lean();
-      return p.quantity * (prod ? prod.prom_price : 0);
+  
+    if (!productId) {
+      throw new Error("Product ID is required");
+    }
+  
+    const product = await findProductById(productId);
+    if (!product) throw new NotFoundResponse("Product not found");
+  
+    let cart = await Cart.findOne({
+      userId: user._id,
+      status: "ACTIVE",
     });
-
-    const productPrices = await Promise.all(productDetailsPromises);
-    cart.total = productPrices.reduce((acc, price) => acc + price, 0);
-
-    // Update and return the cart
-    return await createCart(cart);
-  }
-  // Cập nhật số lượng sản phẩm trong giỏ hàng
-  static async updateProductQuantity(req) {
-    if (req.user._id !== req.params.userId)
-      throw new ForbiddenResponse(
-        "You are not allowed to access this resource"
-      );
-    const userId = req.user._id || req.params.userId;
-    const { productId, quantity } = req.body;
-
-    // Check the user's cart
-    let cart = await findUserCart(userId);
-    if (!cart) throw new NotFoundResponse("Cart not found");
-
-    // Find the product in the cart
-    const existingProduct = cart.products.find(
-      (p) => p.productId._id.toString() === productId.toString()
-    );
-    if (!existingProduct) throw new NotFoundResponse("Product not found in cart");
-
-    // Calculate the quantity change
-    const quantityChange = quantity - existingProduct.quantity;
-
-    // Update the product quantity in the cart
-    existingProduct.quantity = quantity;
-
+  
+    if (!cart) {
+      throw new NotFoundResponse("Cart not found");
+    }
+  
+    const itemIndex = cart.items.findIndex((item) => item.productId.equals(product._id));
+    if (itemIndex === -1) {
+      throw new NotFoundResponse("Item not found in cart");
+    }
+  
+    // Get the quantity of the item to adjust the stock
+    const quantity = cart.items[itemIndex].quantity;
+  
+    // Remove the item from the cart
+    cart.items.splice(itemIndex, 1);
+  
     // Update the product stock
-    await updateProductStock(productId, quantityChange);
-
-    // Recalculate total price
-    const productDetailsPromises = cart.products.map(async (p) => {
-      const prod = await Product.findById(p.productId).lean();
-      return p.quantity * (prod ? prod.prom_price : 0);
-    });
-
-    const productPrices = await Promise.all(productDetailsPromises);
-    cart.total = productPrices.reduce((acc, price) => acc + price, 0);
-
-    // Update and return the cart
-    return await createCart(cart);
+    product.stock += quantity;
+    await product.save();
+  
+    // Save the updated cart
+    await cart.save();
+  
+    return cart;
   }
+
+  static async removeCart(req) {
+    
+    const user = await findUserById(req.user._id || req.params.userId);
+    if (!user) throw new NotFoundResponse("User not found");
+  
+    let cart = await Cart.findOne({
+      userId: user._id,
+      status: "ACTIVE",
+    });
+  
+    if (!cart) {
+      throw new NotFoundResponse("Cart not found");
+    }
+  
+    // Update product stock for each item in the cart
+    for (const item of cart.items) {
+      const product = await findProductById(item.productId);
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+    }
+  
+    // Remove the cart
+    await Cart.deleteOne({
+      userId: user._id,
+      status: "ACTIVE",
+    });
+  
+    return { message: "Cart successfully removed" };
+  }
+  
+  
 }
 
 module.exports = CartService;

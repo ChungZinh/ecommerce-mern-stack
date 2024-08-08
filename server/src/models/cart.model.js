@@ -3,6 +3,19 @@ const mongoose = require("mongoose"); // Erase if already required
 const DOCUMENT_NAME = "Cart";
 const COLLECTION_NAME = "carts";
 
+const cartItemSchema = new mongoose.Schema({
+  productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+  },
+  quantity: {
+      type: Number,
+      required: true,
+      default: 1,
+  },
+});
+
 // Declare the Schema of the Mongo model
 var cartSchema = new mongoose.Schema(
   {
@@ -11,22 +24,11 @@ var cartSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    products: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
+    items: [cartItemSchema],
     total: {
       type: Number,
       required: true,
+      default: 0,
     },
     status: {
       type: String,
@@ -41,11 +43,18 @@ var cartSchema = new mongoose.Schema(
   }
 );
 
-cartSchema.pre("save", function (next) {
-  this.total = this.products.reduce(
-    (acc, product) => acc + product.quantity * product.price,
-    0
-  );
+cartSchema.pre("save", async function (next) {
+  const cart = this;
+  await cart.populate('items.productId');
+  cart.total = cart.items.reduce((acc, item) => {
+    const product = item.productId;
+    const price = product.prom_price || product.regu_price;
+    const quantity = item.quantity;
+    if (isNaN(price) || isNaN(quantity)) {
+      return acc;
+    }
+    return acc + quantity * price;
+  }, 0);
   next();
 });
 

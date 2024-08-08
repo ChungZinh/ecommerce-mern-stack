@@ -10,4 +10,6 @@ router.delete(
   "/:userId/items/:productId",
   asyncHandler(CartController.removeProductFromCart)
 );
+router.delete("/:userId", asyncHandler(CartController.removeCart));
+
 module.exports = router;
