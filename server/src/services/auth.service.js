@@ -20,7 +20,8 @@ class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
-      name: email.split("@")[0],
+      lastName: email.split("@")[0],
+      firstName: email.split("@")[0],
       email,
       mobile,
       password: hashedPassword,

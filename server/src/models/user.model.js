@@ -9,13 +9,11 @@ var userSchema = new mongoose.Schema(
     lastName: {
       type: String,
       required: true,
-      default: "Last Name",
       index: true,
     },
     firstName: {
       type: String,
       required: true,
-      default: "First Name",
       index: true,
     },
     email: {
