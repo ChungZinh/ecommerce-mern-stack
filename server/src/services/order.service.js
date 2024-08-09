@@ -21,8 +21,11 @@ class OrderService {
     const { address, city, country, orderNote, paymentMethod, totalPrice } =
       req.body;
 
+    console.log("totalPrice", totalPrice);
+    console.log("cart.total", cart.total);
+
     // check total price
-    if (parseFloat(totalPrice) !== cart.total) {
+    if (totalPrice !== cart.total) {
       throw new NotFoundResponse("Invalid total price");
     }
 

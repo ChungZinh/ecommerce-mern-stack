@@ -35,7 +35,7 @@ var orderSchema = new mongoose.Schema(
         },
       },
     ],
-    orderNote: {
+    orderNotes: {
       type: String,
     },
     totalPrice: {
