@@ -30,6 +30,7 @@ import {
   removeItemFromCart,
   updateCart,
 } from "../redux/cart/cartSlice";
+import { Link } from "react-router-dom";
 export default function Cart() {
   const dispatch = useDispatch<AppDispatch>();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
@@ -256,7 +257,7 @@ export default function Cart() {
                 size={"md"}
                 className="text-white bg-[#3BB578] md:w-full mt-4"
               >
-                Proceed to Checkout
+                <Link to="/checkout">Proceed to Checkout</Link>
               </Button>
             </div>
           </div>

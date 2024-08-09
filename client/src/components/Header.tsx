@@ -55,6 +55,8 @@ export default function Header() {
     }
   };
 
+
+
   return (
     <div>
       {role === "admin" ? (
@@ -184,7 +186,7 @@ export default function Header() {
                           <HiOutlineShoppingCart className="text-2xl text-[#3BB67F]" />
                           <span className="text-sm">Cart</span>
                         </div>
-                        {cartSize > 0 && (
+                        {currentUser && cartSize > 0 && (
                           <span className="text-xs bg-[#3BB67F] text-white absolute top-0 right-[-10px] rounded-full w-4 font-semibold text-center h-4">
                             {cartSize}
                           </span>
