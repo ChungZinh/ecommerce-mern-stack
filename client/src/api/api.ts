@@ -222,4 +222,12 @@ export const api = {
         "x-client-id": userId,
       },
     }),
+  placeOrder: (order: any, userId: string): Promise<any> =>
+    request<ApiResponse<any>>("/order", {
+      method: "POST",
+      headers: {
+        "x-client-id": userId,
+      },
+      body: JSON.stringify(order),
+    }),
 };

@@ -1,16 +1,61 @@
-import { Breadcrumb, Button, Label, Textarea, TextInput } from "flowbite-react";
+import {
+  Breadcrumb,
+  Button,
+  Label,
+  Spinner,
+  Textarea,
+  TextInput,
+} from "flowbite-react";
 import { HiHome } from "react-icons/hi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { HiOutlineReceiptPercent, HiReceiptPercent } from "react-icons/hi2";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { api } from "../api/api";
+import { clearCart } from "../redux/cart/cartSlice";
+import { useNavigate } from "react-router-dom";
+
+interface FormData {
+  address: string;
+  city: string;
+  country: string;
+  orderNotes: string;
+  paymentMethod: string;
+  totalPrice: number;
+}
 
 export default function Checkout() {
+  const navigate = useNavigate();
   const cartSize = useSelector((state: RootState) => state.cart.cartSize);
   const cart = useSelector((state: RootState) => state.cart.cartItems);
   const total = useSelector((state: RootState) => state.cart.total);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const [formData, setFormData] = useState({} as FormData);
   const tax = (total * 0.05).toFixed(2); // Assuming 5% tax
   const grandTotal = (parseFloat(total) + parseFloat(tax)).toFixed(2);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await api.placeOrder(
+        { ...formData, totalPrice: total },
+        currentUser._id
+      );
+      if (res.data) {
+        setLoading(false);
+        dispatch(clearCart());
+        navigate("/orders");
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mx-auto w-full px-4">
@@ -37,7 +82,10 @@ export default function Checkout() {
           {cartSize > 1 ? `are ${cartSize} products` : `is ${cartSize} product`}{" "}
           in your cart{" "}
         </p>
-        <form className="w-full lg:flex gap-6 items-center">
+        <form
+          className="w-full lg:flex gap-6 items-center"
+          onSubmit={handleSubmit}
+        >
           <div className="lg:w-3/5">
             <div className="flex items-center bg-white border justify-between rounded-md mt-4">
               <div className="flex items-center gap-4 ">
@@ -88,20 +136,29 @@ export default function Checkout() {
                       placeholder="Enter Address"
                       value={currentUser?.address}
                       id="address"
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="">
                     <Label>City</Label>
-                    <TextInput placeholder="Enter City" id="city" />
+                    <TextInput
+                      placeholder="Enter City"
+                      id="city"
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="">
                     <Label>Country</Label>
-                    <TextInput placeholder="Enter Country" id="country" />
+                    <TextInput
+                      placeholder="Enter Country"
+                      id="country"
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
                 <div className="mt-4">
                   <Label>Order Notes</Label>
-                  <Textarea rows={10} id="order_notes" />
+                  <Textarea rows={10} id="orderNotes" onChange={handleChange} />
                 </div>
               </div>
             </div>
@@ -147,12 +204,14 @@ export default function Checkout() {
                 <p className="text-[#3BB67F] text-xl font-semibold">
                   ${grandTotal}
                 </p>
+                <input type="hidden" value={total} id="totalPrice" />
               </div>
               <div className="">
                 <Label>Payment Method</Label>
                 <select
                   className="w-full border rounded-md py-2 px-4"
-                  id="payment_method"
+                  id="paymentMethod"
+                  onChange={handleChange}
                 >
                   <option value="">Select Payment Method</option>
                   <option value="cod">Cash on Delivery</option>
@@ -160,7 +219,16 @@ export default function Checkout() {
                   <option value="credit-card">Credit Card</option>
                 </select>
               </div>
-              <Button className="w-full bg-[#3BB67F] mt-4">Place Order</Button>
+              <Button type="submit" className="w-full bg-[#3BB67F] mt-4">
+                {loading ? (
+                  <div className="">
+                    <Spinner size={"sm"} />
+                    <span className="pl-3">Loading...</span>
+                  </div>
+                ) : (
+                  "Place Order"
+                )}
+              </Button>
             </div>
           </div>
         </form>
