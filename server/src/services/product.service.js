@@ -52,7 +52,7 @@ class ProductService {
       timeNow.getDate()
     );
 
-    const lastMonthPosts = await Product.countDocuments({
+    const lastMonthProducts = await Product.countDocuments({
       createdAt: { $gte: oneMonthAgo },
     });
 
@@ -60,7 +60,7 @@ class ProductService {
       products,
       totalPages,
       totalProducts,
-      lastMonthPosts,
+      lastMonthProducts,
     };
   }
 

@@ -56,7 +56,7 @@ class CategoryService {
       timeNow.getDate()
     );
 
-    const lastMonthPosts = await Category.countDocuments({
+    const lastMonthCategories  = await Category.countDocuments({
       createdAt: { $gte: oneMonthAgo },
     });
 
@@ -64,7 +64,7 @@ class CategoryService {
       categories,
       totalPages,
       totalCategories,
-      lastMonthPosts,
+      lastMonthCategories,
     };
   }
 
