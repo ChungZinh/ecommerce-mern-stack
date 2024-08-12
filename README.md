@@ -97,6 +97,11 @@ cd ecommerce-mern-stack
     node --watch index.js
     ```
 
+### Deployment
+
+The application is deployed and accessible at https://nest-ecommerce-one.vercel.app/.
+
+
 ### Dashboard
 
 - The admin dashboard can be accessed from the frontend application. It allows administrators to:
