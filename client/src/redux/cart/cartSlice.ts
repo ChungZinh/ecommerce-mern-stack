@@ -1,21 +1,26 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { BASE_URL } from "../../constants";
-
 interface CartItem {
-  productId: string;
+  productId: {
+    _id: string;
+    name: string;
+    image: string;
+    price: number;
+    prom_price: number;
+    description: string;
+    category: string;
+    brand: string;
+    rating: number;
+    numReviews: number;
+    countInStock: number;
+  };
   quantity: number;
 }
 
-interface Cart {
-  userId: string;
-  items: CartItem[];
-  total: number;
-  status: string;
-}
 interface CartState {
   cartItems: CartItem[];
-  cartSize?: number;
-  total?: number;
+  cartSize: number;
+  total: number;
   error: string | null;
   loading: boolean;
 }
@@ -27,7 +32,6 @@ const initialState: CartState = {
   error: null,
   loading: false,
 };
-
 export const fetchCart = createAsyncThunk<
   { items: CartItem[] }, // Ensure this matches your API response
   string,
@@ -80,9 +84,9 @@ export const addItemToCart = createAsyncThunk<
       if (!response.ok) {
         throw new Error("Failed to add item to cart");
       }
-      const data: CartItem = await response.json();
+      const data = await response.json();
       // Ensure data structure matches your expectations
-      if (!data || !data.data || !data.data.items) {
+      if (!data) {
         throw new Error("Unexpected response structure");
       }
 
@@ -254,9 +258,6 @@ const cartSlice = createSlice({
         state.loading = true;
       })
       .addCase(updateCart.fulfilled, (state, action) => {
-        // state.cartItems = state.cartItems.map((item) =>
-        //   item.productId === action.payload.productId ? action.payload : item
-        // );
         const updatedCart = action.payload;
         state.cartItems = updatedCart.items;
         state.cartSize = updatedCart.items.reduce(
