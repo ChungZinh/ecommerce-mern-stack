@@ -96,8 +96,9 @@ class OrderService {
         ],
       }),
     })
-      .populate("customer", "name email")
+      .populate("customer", "lastName firstName email mobile")
       .populate("orderItems.cartItem.productId")
+      // .populate("orderItems.cartItem")
       .sort({ createdAt: sortDirection })
       .skip((page - 1) * limit)
       .limit(limit);
