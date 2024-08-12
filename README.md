@@ -32,70 +32,53 @@ This project is a full-stack eCommerce application built with the MERN stack (Mo
 
 ### Clone the Repository
 
-```bash
-git clone https://github.com/ChungZinh/ecommerce-mern-stack.git
-cd ecommerce-mern-stack
-```
+        git clone https://github.com/ChungZinh/ecommerce-mern-stack.git
+        cd ecommerce-mern-stack
+
 
 ### Frontend Setup
 
-    1. Navigate to the `client` directory:
+1. Navigate to the `client` directory:
 
-    ```bash
-    cd client
-    ```
+        cd client
 
-    2. Install dependencies:
+2. Install dependencies:
 
-    ```bash
-    npm install
-    ```
+        npm install
 
-    3. Create a `.env` file in the `client` directory and add the following environment variable:
+3. Create a `.env` file in the `client` directory and add the following environment variable:
 
-    ```env
-    VITE_S3_ACCESS_KEY="your-access-key"
-    VITE_S3_SECRET_ACCESS_KEY="your-secret-access-key"
-    VITE_S3_REGION="region"
-    VITE_S3_BUCKET="your-bucket"
-    ```
+        VITE_S3_ACCESS_KEY="your-access-key"
+        VITE_S3_SECRET_ACCESS_KEY="your-secret-access-key"
+        VITE_S3_REGION="region"
+        VITE_S3_BUCKET="your-bucket"
 
-    4. Start the frontend:
+4. Start the frontend:
 
-    ```bash
-    npm start
-    ```
+        npm start
 
 ### Backend Setup
 
-    1. Navigate to the `server` directory:
+1. Navigate to the `server` directory:
 
-    ```bash
-    cd server
-    ```
+        cd server
 
 
-    2. Install dependencies:
+2. Install dependencies:
 
-    ```bash
-    npm install
-    ```
+        npm install
 
 
-    3. Create a `.env` file in the `server` directory and add the following environment variables:
+ 3. Create a `.env` file in the `server` directory and add the following environment variables:
 
-    ```env
-    MONGO_URI=<Your MongoDB URI>
-    PORT=5000
-    EMAIL=<Your email>
-    PASSWORD=<Your password>
-    ```
+        MONGO_URI=<Your MongoDB URI>
+        PORT=5000
+        EMAIL=<Your email>
+        PASSWORD=<Your password>
 
-    4: Start the server:
+4: Start the server:
 
-    ```bash
-    node --watch index.js
-    ```
+        node --watch index.js
 
 ### Deployment
 
