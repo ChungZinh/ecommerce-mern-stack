@@ -80,6 +80,51 @@ class OrderService {
 
     await transporter.sendMail(mailOptions);
   }
+
+  static async getOrders(req) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
+
+    const orders = await Order.find({
+      ...(req.query.orderId && { _id: req.query.orderId }),
+      ...(req.query.customerId && { customer: req.query.customerId }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { _id: { $regex: req.query.searchTerm, $options: "i" } },
+          { paymentMethod: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .populate("customer", "name email")
+      .populate("orderItems.cartItem.productId")
+      .sort({ createdAt: sortDirection })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalOrders = await Order.countDocuments();
+
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    const timeNow = new Date();
+
+    const oneMonthAgo = new Date(
+      timeNow.getFullYear(),
+      timeNow.getMonth() - 1,
+      timeNow.getDate()
+    );
+
+    const lastMonthOrders = await Order.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    return {
+      orders,
+      totalPages,
+      totalOrders,
+      lastMonthOrders,
+    };
+  }
 }
 
 module.exports = OrderService;
