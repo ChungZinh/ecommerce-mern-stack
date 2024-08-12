@@ -41,8 +41,8 @@ export default function DashSideBar() {
             <Link to={"/dashboard?tab=dashboard"}>Dashboard</Link>
           </Sidebar.Item>
           <Sidebar.Collapse icon={HiShoppingBag} label="Products">
-            <Sidebar.Item href="#" active={tab === "product_list"}>
-              <Link to={"/dashboard?tab=product_list"}>Product List</Link>
+            <Sidebar.Item href="#" active={tab === "product-list"}>
+              <Link to={"/dashboard?tab=product-list"}>Product List</Link>
             </Sidebar.Item>
             <Sidebar.Item href="#">Product Gird</Sidebar.Item>
             <Sidebar.Item href="#" active={tab === "categories"}>
@@ -50,8 +50,10 @@ export default function DashSideBar() {
             </Sidebar.Item>
           </Sidebar.Collapse>
           <Sidebar.Collapse icon={HiShoppingCart} label="Orders">
-            <Sidebar.Item href="#">Order list 1</Sidebar.Item>
-            <Sidebar.Item href="#">Order list 1</Sidebar.Item>
+            <Sidebar.Item active={tab === "order-list"}>
+              <Link to={"/dashboard?tab=order-list"}>Order list 1</Link>
+            </Sidebar.Item>
+            <Sidebar.Item href="#">Order list 2</Sidebar.Item>
             <Sidebar.Item href="#">Order detail</Sidebar.Item>
           </Sidebar.Collapse>
           <Sidebar.Collapse icon={HiWallet} label="Sellers">

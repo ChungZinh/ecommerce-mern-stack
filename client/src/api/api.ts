@@ -230,4 +230,20 @@ export const api = {
       },
       body: JSON.stringify(order),
     }),
+
+  getOrdersByUser: (userId: string): Promise<ApiResponse<any>> =>
+    request<ApiResponse<any>>(`/order?customerId=${userId}`, {
+      method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
+  getOrders: (userId: string, query: string): Promise<ApiResponse<any>> =>
+    request<ApiResponse<any>>(`/order${query}`, {
+      method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
 };

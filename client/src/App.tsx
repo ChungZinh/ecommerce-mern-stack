@@ -15,6 +15,7 @@ import Cart from "./pages/Cart";
 import UserRoute from "./components/UserRoute";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
+import MyAccout from "./pages/MyAccout";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/my-account" element={<MyAccout />} />
         </Route>
         <Route element={<AdminRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

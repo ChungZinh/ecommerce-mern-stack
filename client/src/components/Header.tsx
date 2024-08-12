@@ -55,8 +55,6 @@ export default function Header() {
     }
   };
 
-
-
   return (
     <div>
       {role === "admin" ? (
@@ -195,32 +193,10 @@ export default function Header() {
                     </Link>
                     <div className="">
                       {currentUser ? (
-                        <Dropdown
-                          arrowIcon={false}
-                          inline
-                          label={
-                            <div className="flex items-center">
-                              <HiOutlineUser className="text-2xl text-[#3BB67F]" />
-                              <span className="text-sm">Account</span>
-                            </div>
-                          }
-                        >
-                          <Dropdown.Header>
-                            <div className="flex items-center">
-                              <HiOutlineUser className="text-2xl text-[#3BB67F]" />
-                              <span className="block text-sm">
-                                {currentUser.email}
-                              </span>
-                            </div>
-                          </Dropdown.Header>
-                          <Link to={"/profile"}>
-                            <Dropdown.Item>Profile</Dropdown.Item>
-                          </Link>
-                          <Dropdown.Divider />
-                          <Dropdown.Item onClick={handleLogout}>
-                            Sign out
-                          </Dropdown.Item>
-                        </Dropdown>
+                        <Link to={'/my-account'}  className="flex items-center">
+                          <HiOutlineUser className="text-2xl text-[#3BB67F]" />
+                          <span className="text-sm">Account</span>
+                        </Link>
                       ) : (
                         <Button className="bg-[#3BB67F] hover:bg-[#D9F1E4] duration-200">
                           <Link to="/sign-in">Sign In</Link>

@@ -1,4 +1,4 @@
-import { Button, Checkbox,  Spinner,  TextInput } from "flowbite-react";
+import { Button, Checkbox, Spinner, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +6,6 @@ import { RootState } from "../redux/store";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { signInStart, signInSuccess } from "../redux/user/userSlice";
 import { api } from "../api/api";
-
 
 interface FormData {
   email: string;
@@ -29,10 +28,14 @@ export default function SignIn() {
     try {
       const res = await api.signIn(formData);
       if (res.data.user) {
-        localStorage.setItem("token", res.data.token)
+        localStorage.setItem("token", res.data.token);
         console.log(res.data.user);
         dispatch(signInSuccess(res.data.user));
-        navigate("/");
+        if (res.data.user.isAdmin) {
+          navigate("/dashboard");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +80,7 @@ export default function SignIn() {
               size="xl"
               type="submit"
             >
-               {loading ? (
+              {loading ? (
                 <div className="">
                   <Spinner size={"sm"} />
                   <span className="pl-3">Loading...</span>
