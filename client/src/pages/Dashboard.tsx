@@ -8,6 +8,7 @@ import DashProductList from "../components/dashboard/DashProductList";
 import DashEditProduct from "../components/dashboard/DashEditProduct";
 import DashOrderList from "../components/dashboard/DashOrderList";
 import DashOrderDetail from "../components/dashboard/DashOrderDetail";
+import Dash from "../components/dashboard/Dash";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function Dashboard() {
         <DashSideBar />
       </div>
       {/* SETTING */}
+      {tab === "dashboard" && <Dash />}
       {tab === "setting" && <DashSetting />}
       {tab === "addProduct" && <DashAddProduct />}
       {tab === "categories" && <DashCategories />}

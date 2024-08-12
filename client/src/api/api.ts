@@ -144,6 +144,14 @@ export const api = {
       },
     }),
 
+  getUsers: (query: string, userId: string): Promise<ApiResponse<any[]>> =>
+    request<ApiResponse<any[]>>(`/user${query}`, {
+      method: "GET",
+      headers: {
+        "x-client-id": userId,
+      },
+    }),
+
   getListCategory: (query: string): Promise<ApiResponse<Category[]>> =>
     request<ApiResponse<Category[]>>(`/category${query}`, {
       method: "GET",
