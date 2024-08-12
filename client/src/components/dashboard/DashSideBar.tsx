@@ -54,7 +54,9 @@ export default function DashSideBar() {
               <Link to={"/dashboard?tab=order-list"}>Order list 1</Link>
             </Sidebar.Item>
             <Sidebar.Item href="#">Order list 2</Sidebar.Item>
-            <Sidebar.Item href="#">Order detail</Sidebar.Item>
+            <Sidebar.Item active={tab === "order-detail"}>
+              <Link to={"/dashboard?tab=order-detail"}>Order Detail</Link>
+            </Sidebar.Item>
           </Sidebar.Collapse>
           <Sidebar.Collapse icon={HiWallet} label="Sellers">
             <Sidebar.Item href="#">Sellers cards</Sidebar.Item>

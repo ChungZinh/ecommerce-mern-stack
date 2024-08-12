@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { formatCreatedAt } from "../../utils/formatDate";
 import { buildQueryString } from "../../utils/buildQueryString";
+import { Link } from "react-router-dom";
 
 export default function DashOrderList() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
@@ -84,7 +85,9 @@ export default function DashOrderList() {
                     <Table.Cell>{order.status}</Table.Cell>
                     <Table.Cell>{formatCreatedAt(order.createdAt)}</Table.Cell>
                     <Table.Cell>
-                      <Button  className="bg-[#3BB67F]">Detal</Button>
+                      <Link to={`/dashboard?tab=order-detail&id=${order._id}`}>
+                        <Button className="bg-[#3BB67F]">Detail</Button>
+                      </Link>
                     </Table.Cell>
                   </Table.Row>
                 ))}

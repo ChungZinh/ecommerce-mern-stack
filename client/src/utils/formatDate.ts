@@ -15,3 +15,22 @@ export const formatCreatedAt = (dataString: string) => {
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
+
+export const formatCreatedAt_v1 = (createdAt: string) => {
+  const date = new Date(createdAt);
+  const options = {
+    weekday: "short", // e.g., 'Wed'
+    year: "numeric", // e.g., '2020'
+    month: "short", // e.g., 'Aug'
+    day: "numeric", // e.g., '13'
+  };
+
+  const formattedDate = date.toLocaleDateString("en-US", options);
+  const formattedTime = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true, // e.g., '4:30 PM'
+  });
+
+  return `${formattedDate}, ${formattedTime}`;
+};
