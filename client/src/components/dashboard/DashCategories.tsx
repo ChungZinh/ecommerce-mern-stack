@@ -17,9 +17,10 @@ import { buildQueryString } from "../../utils/buildQueryString";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 interface FormData {
+  _id: string;
   name: string;
   slug: string;
-  parentCategory: string;
+  parent: string;
   description: string;
 }
 interface Category {
@@ -38,7 +39,6 @@ export default function DashCategories() {
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [editMode, setEditMode] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
@@ -50,8 +50,10 @@ export default function DashCategories() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const sQuery = buildQueryString(query);
-        const res = await api.getListCategory(sQuery);
+        const queryObject =
+          typeof query === "string" ? { search: query } : query;
+        const sQuery = buildQueryString(queryObject);
+        const res: any = await api.getListCategory(sQuery);
         if (res.data) {
           setCategories(res.data.categories);
           setTotalPages(res.data.totalPages);
@@ -75,9 +77,10 @@ export default function DashCategories() {
         setLoading(false);
         if (loading === false) {
           setFormData({
+            _id: "",
             name: "",
             slug: "",
-            parentCategory: "",
+            parent: "",
             description: "",
           });
         }
@@ -99,7 +102,6 @@ export default function DashCategories() {
   };
 
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
     setQuery((prevQuery) => ({
       ...prevQuery,
       searchTerm: e.target.value,
@@ -124,6 +126,7 @@ export default function DashCategories() {
       if (res.data) {
         setEditMode(false);
         setFormData({
+          _id: "",
           name: "",
           slug: "",
           parent: "",

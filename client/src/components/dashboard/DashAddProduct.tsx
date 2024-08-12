@@ -15,13 +15,6 @@ import { api } from "../../api/api";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { s3Config } from "../../aws/s3Config";
 
-interface category {
-  name: string;
-  subCategories?: category[];
-  slug: string;
-  tag?: string;
-  description: string;
-}
 
 interface FormData {
   name: string;
@@ -58,12 +51,11 @@ export default function DashAddProduct() {
   const [formData, setFormData] = useState({} as FormData);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.getListCategory(query);
+        const res : any = await api.getListCategory("");
         if (res.data) {
           setCategories(res.data.categories);
           // set all text fields to empty
@@ -224,7 +216,7 @@ export default function DashAddProduct() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={handleChange}
+                    onChange={handleChange as any}
                     rows="6"
                     required
                     placeholder="Type here"
@@ -258,7 +250,7 @@ export default function DashAddProduct() {
                     <Select
                       id="currency"
                       value={formData.currency}
-                      onChange={handleChange}
+                      onChange={handleChange as any}
                     >
                       <option value={"USD"}>USD</option>
                       <option value={"VND"}>VND</option>
@@ -359,14 +351,14 @@ export default function DashAddProduct() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleImageChange}
+                  onChange={handleImageChange as any}
                   ref={imageRef}
                   className="hidden"
                 />
                 <div className="flex items-center justify-center mt-4">
                   <Button
                     className="px-4 inline text-center"
-                    onClick={handleUpload}
+                    onClick={handleUpload as any}
                   >
                     {loading ? (
                       <div className="">
@@ -389,7 +381,7 @@ export default function DashAddProduct() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>Category</Label>
-                    <Select id="category" onChange={handleChange}>
+                    <Select id="category" onChange={handleChange as any}>
                       <option value="">None</option>
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>
@@ -400,7 +392,7 @@ export default function DashAddProduct() {
                   </div>
                   <div className="space-y-2">
                     <Label>Sub-category</Label>
-                    <Select id="sub-category" onChange={handleChange}>
+                    <Select id="sub-category" onChange={handleChange as any}>
                       <option value="">None</option>
                       {selectedCategory &&
                         selectedCategory.subCategories &&
@@ -415,7 +407,7 @@ export default function DashAddProduct() {
                 <div className="space-y-2">
                   <Label>Tags</Label>
                   <TextInput
-                    onChange={handleChange}
+                    onChange={handleChange as any}
                     id="tag"
                     placeholder="Type here"
                   />

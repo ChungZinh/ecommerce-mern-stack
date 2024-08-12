@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RootState } from "../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -8,7 +8,6 @@ import {
   HiChartPie,
   HiCog,
   HiCurrencyDollar,
-  HiFolderAdd,
   HiShoppingBag,
   HiShoppingCart,
   HiTag,
@@ -19,8 +18,6 @@ import { HiWallet } from "react-icons/hi2";
 import { MdComment, MdStars } from "react-icons/md";
 
 export default function DashSideBar() {
-  const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const dispatch = useDispatch();
   const [tab, setTab] = useState("");
   const location = useLocation();
   useEffect(() => {

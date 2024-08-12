@@ -1,6 +1,4 @@
-import { useSelector } from "react-redux";
 import { BASE_URL } from "../constants";
-import { RootState } from "../redux/store";
 
 interface Credentials {
   email: string;
@@ -8,6 +6,7 @@ interface Credentials {
 }
 
 interface FormData {
+  _id: string;
   firstName: string;
   lastName: string;
   mobile: string;
@@ -18,6 +17,7 @@ interface FormData {
 }
 
 interface Product {
+  _id: string;
   name: string;
   stock: number;
   description: string;
@@ -152,8 +152,8 @@ export const api = {
       },
     }),
 
-  getListCategory: (query: string): Promise<ApiResponse<Category[]>> =>
-    request<ApiResponse<Category[]>>(`/category${query}`, {
+  getListCategory: (query: string): Promise<ApiResponse<any[]>> =>
+    request<ApiResponse<any>>(`/category${query}`, {
       method: "GET",
     }),
   createProduct: (
@@ -180,8 +180,8 @@ export const api = {
       },
     }),
 
-  getProductsList: (query: string): Promise<ApiResponse<Product[]>> =>
-    request<ApiResponse<Product[]>>(`/product${query}`, {
+  getProductsList: (query: string): Promise<ApiResponse<any[]>> =>
+    request<ApiResponse<any[]>>(`/product${query}`, {
       method: "GET",
     }),
 

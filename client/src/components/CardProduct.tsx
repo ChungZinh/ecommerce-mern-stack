@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../redux/store";
 
 import { addItemToCart } from "../redux/cart/cartSlice";
-import { AsyncThunkAction } from "@reduxjs/toolkit";
-
 interface Product {
   _id: string;
   name: string;

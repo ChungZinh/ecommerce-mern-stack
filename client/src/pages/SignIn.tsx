@@ -26,7 +26,7 @@ export default function SignIn() {
     e.preventDefault();
     dispatch(signInStart());
     try {
-      const res = await api.signIn(formData);
+      const res : any = await api.signIn(formData);
       if (res.data.user) {
         localStorage.setItem("token", res.data.token);
         console.log(res.data.user);

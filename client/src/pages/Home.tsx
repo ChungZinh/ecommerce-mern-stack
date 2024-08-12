@@ -13,12 +13,7 @@ import banner4 from "../assets/images/deals_banner/banner4.png";
 import banner5 from "../assets/images/deals_banner/banner5.png";
 import banner6 from "../assets/images/deals_banner/banner6.png";
 import banner7 from "../assets/images/deals_banner/banner7.png";
-import {
-  HiArrowRight,
-  HiOutlineShoppingCart,
-  HiShoppingCart,
-  HiStar,
-} from "react-icons/hi";
+import { HiArrowRight } from "react-icons/hi";
 import CardDeal from "../components/CardDeal";
 import CardProduct from "../components/CardProduct";
 import { buildQueryString } from "../utils/buildQueryString";
@@ -33,6 +28,7 @@ interface Category {
   image: string;
 }
 interface Product {
+  _id: string;
   name: string;
   stock: number;
   description: string;
@@ -50,16 +46,23 @@ interface Product {
   isDraft: boolean;
   isPublished: boolean;
 }
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  statusCode?: number;
+}
+
 export default function Home() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("" as string);
   const [value, setValue] = useState<number[]>([500, 1000]);
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const handleChange = (event: Event, newValue: number | number[]) => {
+  const handleChange = (newValue: number | number[]) => {
     setValue(newValue as number[]);
   };
   function valuetext(value: number) {
@@ -68,15 +71,16 @@ export default function Home() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await api.getListCategory(query);
+      const res: any = await api.getListCategory(query);
       if (res.data.categories) {
         setCategories(res.data.categories);
       }
     };
 
     const fetchProducts = async () => {
-      const queryB = buildQueryString(query);
-      const res = await api.getProductsList(queryB);
+      const queryObject = typeof query === "string" ? { search: query } : query;
+      const queryB = buildQueryString(queryObject);
+      const res: any = await api.getProductsList(queryB);
       if (res.data.products) {
         setProducts(res.data.products);
         setTotalPages(res.data.totalPages);
@@ -140,9 +144,7 @@ export default function Home() {
                 style={{ color: "#3BB67F" }}
               />
               <div className="flex items-center *:text-xs justify-between">
-                <p className="text-xs" className="text-xs">
-                  from: ${value[0]}
-                </p>
+                <p className="text-xs">from: ${value[0]}</p>
                 <p className="text-xs">to: ${value[1]}</p>
               </div>
               <div className="mt-2">

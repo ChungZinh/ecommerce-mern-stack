@@ -69,7 +69,6 @@ interface FormData {
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { loadingUpdate } = useSelector((state: RootState) => state.user);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(currentUser.avatar);
@@ -198,8 +197,8 @@ const Profile = () => {
               <Label className="text-sm text-neutral-500">Birthday</Label>
               <Datepicker
                 id="dateOfBirth"
-                value={selectedDate}
-                onSelectedDateChanged={handleDateChange}
+                value={selectedDate || ""}
+                onSelectedDateChanged={handleDateChange as any}
               />
             </div>
           </div>

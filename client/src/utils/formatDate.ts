@@ -1,4 +1,4 @@
-export const formatDate = (dateString: Date) => {
+export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
 
   const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1)
@@ -18,7 +18,7 @@ export const formatCreatedAt = (dataString: string) => {
 
 export const formatCreatedAt_v1 = (createdAt: string) => {
   const date = new Date(createdAt);
-  const options = {
+  const options: Intl.DateTimeFormatOptions = {
     weekday: "short", // e.g., 'Wed'
     year: "numeric", // e.g., '2020'
     month: "short", // e.g., 'Aug'
@@ -34,3 +34,4 @@ export const formatCreatedAt_v1 = (createdAt: string) => {
 
   return `${formattedDate}, ${formattedTime}`;
 };
+
